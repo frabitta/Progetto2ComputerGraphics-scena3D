@@ -1,5 +1,6 @@
 #include "lib.h"
 #include "inizializzazioniGL.h"
+#include <GL/gl.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 // Dichiarazioni funzioni di supporto
@@ -7,7 +8,7 @@
 /* lettura dei file di shader */
 char* readShaderSource(const char* shaderFile);
 /* compila la shader caricata */
-int compileShader(GLuint shaderId, string fileName);
+int compileShader(GLuint shaderId, const GLchar* shader, string fileName);
 /* caricamento di un file di texture */
 unsigned int loadTexture(char const* path, int flip);
 /* caricamento di un file cubemap */
@@ -24,7 +25,7 @@ int INIT_finestraOpenGL(GLFWwindow*& window, const int height, const int width) 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+	
 	//Abilita il double buffering
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
@@ -72,20 +73,29 @@ int INIT_Texture(string fileName, int flip) {
 }
 
 GLuint INIT_shaderProg(const char* vertexFilename, const char* fragmentFilename) {
+	GLenum ErrorCheckValue = glGetError();
+
 	const string vertexPath = shaderPath + vertexFilename;
 	const  GLchar* VertexShader = readShaderSource(vertexPath.c_str());
 	GLuint vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
-	compileShader(vertexShaderId, vertexFilename);
+	compileShader(vertexShaderId, VertexShader, vertexFilename);
 
 	const string fragmentPath = shaderPath + fragmentFilename;
 	const GLchar* FragmentShader = readShaderSource(fragmentPath.c_str());
 	GLuint fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-	compileShader(fragmentShaderId, fragmentFilename);
+	compileShader(fragmentShaderId, FragmentShader, fragmentFilename);
 
 	GLuint programId = glCreateProgram();
 	glAttachShader(programId, vertexShaderId);
 	glAttachShader(programId, fragmentShaderId);
 	glLinkProgram(programId);
+	GLint success;
+	GLchar infoLog[512];
+	glGetProgramiv(programId, GL_LINK_STATUS, &success);
+	if (!success) {
+		glGetProgramInfoLog(programId, 512, NULL, infoLog);
+		std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+	}
 
 	return programId;
 }
@@ -112,11 +122,11 @@ char* readShaderSource(const char* shaderFile) {
 	return buf;
 }
 
-int compileShader(GLuint shaderId, string fileName) {
+int compileShader(GLuint shaderId, const GLchar* shader, string fileName) {
 	int success;
 	char infoLog[512];
 
-	glShaderSource(shaderId, 1, (const char**)&shaderId, NULL);
+	glShaderSource(shaderId, 1, (const char**)&shader, NULL);
 	glCompileShader(shaderId);
 	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
 	if (!success) {

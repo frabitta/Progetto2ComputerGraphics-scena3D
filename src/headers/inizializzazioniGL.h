@@ -1,8 +1,9 @@
 #pragma once
+#include "lib.h"
 
-const string shaderPath = "src/shaders/";
-const string texturePath = "resources/textures/";
-const string cubeMapPath = "resources/cubeMaps";
+extern const string shaderPath;
+extern const string texturePath;
+extern const string cubeMapPath;
 
 /* crea una nuova finestra OpenGL*/
 int INIT_finestraOpenGL(GLFWwindow*& window, const int height, const int width);
