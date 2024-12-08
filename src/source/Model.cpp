@@ -1,10 +1,9 @@
 #include "Model.h"
 #include "loadMeshes_assimp.h"
 
-void setupMesh(Mesh* mesh, string nome, ShadingType shadingType, vec4 ancoraLocale);
+void setupMesh(Mesh* mesh, string nome, ShadingType shadingType);
 
 const vec4 COLORE_ANCORA = vec4(0.0, 1.0, 0.0, 1.0);
-const string objPath;
 
 void Model::assingUniformsToMeshes() {
 	for (int i = 0; i < nmeshes; i++) {
@@ -47,10 +46,9 @@ void Model::loadFromObj(const char* fileName, ShadingType shadingType) {
 	this->normalizeModel();
 	
 	for (int i = 0; i < nmeshes; i++) {
-		setupMesh(this->meshes[i], "Modello", shadingType, vec4(0.0, 0.0, 0.0, 1.0));
+		setupMesh(this->meshes[i], "Modello", shadingType);
 	}
-	this->updateMatrix();
-	this->assingUniformsToMeshes();
+	this->initModel();
 }
 
 void printMatrix(mat4 M) {
@@ -73,14 +71,13 @@ void Model::updateMatrix() {
 	{
 		this->meshes[i]->updateModelMatrix(model);
 	}
+
+	this->ancora_world = model * vec4(this->ancora,1.);
 }
 
-void setupMesh(Mesh *mesh, string nome, ShadingType shadingType, vec4 ancoraLocale) {
+void setupMesh(Mesh *mesh, string nome, ShadingType shadingType) {
 	mesh->nome = nome;
 	mesh->shading = shadingType;
-	mesh->ancora = vec4(0.0, 0.0, 0.0, 1.0);
-	mesh->vertices.push_back(mesh->ancora);
-	mesh->colors.push_back(COLORE_ANCORA);
 	mesh->INIT_vao();
 }
 
@@ -123,14 +120,50 @@ void Model::createFromGeometry(Geometry type, vec4 colore, ShadingType shadingTy
 	}
 	this->meshes.push_back(mesh);
 	this->nmeshes++;
-	setupMesh(mesh, "Modello", shadingType, vec4(0.0, 0.0, 0.0, 1.0));
+	this->normalizeModel();
+	setupMesh(mesh, "Modello", shadingType);
+	this->initModel();
+}
+
+void Model::initModel() {
 	this->updateMatrix();
 	this->assingUniformsToMeshes();
+
+	/* setup ancora vao */
+	glGenVertexArrays(1, &this->ancora_VAO);
+	glBindVertexArray(this->ancora_VAO);
+
+	//Genero , rendo attivo, riempio il VBO del punto dell'ancora
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	vec3 anc = this->ancora;
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3), &anc, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(0);
+
+	//Genero , rendo attivo, riempio il VBO del colore dell'ancora
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	vec4 colore = COLORE_ANCORA;
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec4), &colore, GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(1);
+
 }
 
 void Model::renderModel(bool flagAncora) {
 	for (int i = 0; i < this->meshes.size(); i++) {
-		this->meshes[i]->renderMesh(flagAncora);
+		this->meshes[i]->renderMesh();
+	}
+
+	/* disegna l'ancora se richiesto*/
+	if (flagAncora) {
+		glUniform1i(this->loc_uni_Shading, ShadingType::PASS_THROUGH);
+		glBindVertexArray(this->ancora_VAO);
+		glPointSize(15.0);
+		glDrawArrays(GL_POINTS, 0, 1);
+		glBindVertexArray(0);
 	}
 }
 
@@ -140,7 +173,7 @@ void Model::normalizeModel() {
 	vector<vec3> minimo, massimo;
 	vec3 centroid = { 0.0f, 0.0f, 0.0f };
 
-	//Calcolo il centroide della mesh (facendo la medua dei suoi vertici)
+	//Calcolo il centroide della mesh (facendo la media dei suoi vertici)
 	int numVertices = 0;
 	for (i = 0; i < this->meshes.size(); i++) {
 		for (k = 0; k < this->meshes[i]->vertices.size(); k++) {
@@ -148,7 +181,6 @@ void Model::normalizeModel() {
 			numVertices++;
 		}
 	}
-
 	centroid /= numVertices;
 
 	for (i = 0; i < this->meshes.size(); i++) {
@@ -191,6 +223,17 @@ void Model::normalizeModel() {
 			this->meshes[i]->vertices[k].z = 2.0f * (this->meshes[i]->vertices[k].z - minZ) / maxRange - 1.0f;
 		}
 	}
+
+	numVertices = 0;
+	for (i = 0; i < this->meshes.size(); i++) {
+		for (k = 0; k < this->meshes[i]->vertices.size(); k++) {
+			centroid += this->meshes[i]->vertices[k];
+			numVertices++;
+		}
+	}
+	centroid /= numVertices;
+
+	this->ancora = centroid;
 }
 
 void Model::goToPos(vec3 pos) {

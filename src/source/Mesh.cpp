@@ -8,7 +8,6 @@
 
 void Mesh::updateModelMatrix(mat4 M) {
 	this->Model = M;
-	this->ancora_world = M * this->ancora;
 }
 
 void Mesh::INIT_vao() {
@@ -52,7 +51,7 @@ void Mesh::INIT_vao() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(GLuint), this->indices.data(), GL_STATIC_DRAW);
 }
 
-void Mesh::renderMesh(bool flagAncora) {
+void Mesh::renderMesh() {
 
     // shading
     glUniform1i(this->uni_Shading, this->shading);
@@ -77,13 +76,6 @@ void Mesh::renderMesh(bool flagAncora) {
 
     // disegna
     glDrawElements(GL_TRIANGLES, (this->indices.size()) * sizeof(GLuint), GL_UNSIGNED_INT, 0);
-
-    // disegna l'ancora se richiesto
-    if (flagAncora) {
-        glPointSize(15.0);
-        unsigned int ind = (unsigned int)(this->indices.size());
-        glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT, BUFFER_OFFSET(ind * sizeof(GLuint)));
-    }
 
     // disassocia questo VAO
     glBindVertexArray(0);

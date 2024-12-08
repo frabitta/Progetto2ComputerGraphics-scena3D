@@ -30,11 +30,12 @@ uniform vec3 ViewPos;
 uniform int shadingType;
 uniform PointLight light;
 uniform Material material;
-// uniform int textureSi;
+uniform int textureSi;
 
 out vec4 ourColor;      // output color to the fragment shader
 out vec2 frag_coord;    // fragment coordinate
 out int isGouraud;     // flag per il fragment di elaborare il modello d'illuminazione
+out int mixTexture;
 
 float strenght = 0.1;
 
@@ -44,6 +45,7 @@ void main()
     isGouraud = 0;
     ourColor = aColor;
     frag_coord = vec2(0,0);
+    mixTexture = textureSi;
 
     if (shadingType == PHONG || shadingType == BLINN_PHONG) {
         //Trasformare le coordinate del vertice da elaborare (aPos) in coordinate di vista
@@ -89,11 +91,9 @@ void main()
         isGouraud = 1;
     }
     
-    /*
     if (textureSi != 0) {
         frag_coord = coord_st;
     }
-    */
     
     gl_Position = Projection*View*Model*vec4(aPos, 1.0);
 }  

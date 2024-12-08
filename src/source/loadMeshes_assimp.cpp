@@ -17,7 +17,10 @@ bool loadAssImp(const char* path, vector<Mesh *>& mymesh)
 
 	// Fill vertices positions
 	unsigned int num_meshes = scene->mNumMeshes;  //Numero di oggetti che compongono il modello
-	mymesh.resize(num_meshes);  //Faccio il resize di mymesh al numero di mesh che compongono l'oggetto
+	// mymesh.resize(num_meshes);  //Faccio il resize di mymesh al numero di mesh che compongono l'oggetto
+	for (unsigned int i = 0; i < num_meshes; i++) {
+		mymesh.push_back(new Mesh());
+	}
 
 	for (unsigned int nm = 0; nm < num_meshes; nm++)
 	{

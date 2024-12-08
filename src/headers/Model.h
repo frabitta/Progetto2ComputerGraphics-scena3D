@@ -3,6 +3,8 @@
 #include "Mesh.h"
 #include "Geometry.h"
 
+extern const string objPath;
+
 class Model {
 public:
 	/* load uniform indices */
@@ -25,6 +27,7 @@ private:
 	void normalizeModel();
 	void updateMatrix();
 	void assingUniformsToMeshes();
+	void initModel();
 
 	vector<Mesh *> meshes;
 	int nmeshes = 0;
@@ -32,6 +35,11 @@ private:
 	float angolo = 0.f;
 	vec3 rotation_axis = vec3(0.,1.,0.);
 	vec3 dimensioni = vec3(1.,1.,1.);
+
+	vec3 ancora = vec3(0., 0., 0.); // Punto di ancoraggio del modello locale
+	vec4 ancora_world;
+	GLuint ancora_VAO;
+	GLuint ancora_VBO;
 
 	GLint  loc_uni_mat_ambient, loc_uni_mat_diffuse, loc_uni_mat_specular, loc_uni_mat_shininess;
 	GLint  loc_uni_TextureYesNo, loc_uni_TextureLoc;

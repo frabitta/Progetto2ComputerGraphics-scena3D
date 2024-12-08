@@ -20,7 +20,7 @@ struct Materiale {
 class Mesh {
 public:
     void updateModelMatrix(mat4 M);
-    void renderMesh(bool flagAncora);
+    void renderMesh();
     void INIT_vao();
 
     string nome;                // Nome della mesh (utile per l'identificazione)
@@ -31,12 +31,10 @@ public:
     vector<GLuint> indices;     // Vettore contenente gli indici dei vertici che definiscono i triangoli (o altre primitive)
     vector<vec3> normals;       // Vettore contenente i vettori normali ai vertici (utili per il calcolo dell'illuminazione)
     vector<vec2> texCoords;     // Vettore contenente le coordinate delle texture per ciascun vertice
-    vec4 ancora;                // Punto di ancoraggio della mesh nello spazio locale dell'oggetto
     
     // dati mondo
     mat4 Model = mat4(1.0);                 // Matrice di modellazione per applicare trasformazioni alla mesh
-    vec4 ancora_world;          // Punto di ancoraggio della mesh nello spazio del mondo
-
+    
     // buffers
     GLuint VAO;                 // Vertex Array Object: identificatore dell'oggetto che contiene tutte le informazioni sulla mesh
     GLuint VBO_vertices;        // Vertex Buffer Object per le coordinate dei vertici

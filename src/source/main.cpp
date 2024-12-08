@@ -25,7 +25,7 @@ int main(void) {
 	while (!glfwWindowShouldClose(window)) {
 		double currentFrame = glfwGetTime();
 
-		scena.render(currentFrame, false, false);
+		scena.render(currentFrame, false, true);
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 		/* Poll for and process events */

@@ -6,6 +6,7 @@
 
 void loadShaders();
 
+
 // Strutture locali a questa scena
 static struct {
 	GLint  time;
@@ -43,26 +44,28 @@ void Scena::initScene() {
 	this->camera = new Camera();
 	this->light = new Light();
 
-	Model* cubo = new Model();
-	cubo->createFromGeometry(Geometry::CUBO, vec4(1.,0.,0.,1.), ShadingType::PASS_THROUGH);
-	cubo->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
+	Model* modello = new Model();
+	// modello->createFromGeometry(Geometry::CUBO, vec4(1.,0.,0.,1.), ShadingType::PASS_THROUGH);
+	modello->loadFromObj("Shelby.obj", ShadingType::PHONG);
+	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType);
-	cubo->goToPos(vec3(0., 0., 0.));
-	this->models.push_back(cubo);
+	modello->goToPos(vec3(0., -1., -3.));
+	modello->scale(vec3(3., 3., 3.));
+	this->models.push_back(modello);
 
-	cubo = new Model();
-	cubo->createFromGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.), ShadingType::PASS_THROUGH);
-	cubo->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
+	modello = new Model();
+	modello->createFromGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.), ShadingType::PASS_THROUGH);
+	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType);
-	cubo->goToPos(vec3(4.,0.,0.));
-	this->models.push_back(cubo);
+	modello->goToPos(vec3(4.,0.,0.));
+	this->models.push_back(modello);
 
-	cubo = new Model();
-	cubo->createFromGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.), ShadingType::PASS_THROUGH);
-	cubo->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
+	modello = new Model();
+	modello->createFromGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.), ShadingType::PASS_THROUGH);
+	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType);
-	cubo->goToPos(vec3(0., 4., 0.));
-	this->models.push_back(cubo);
+	modello->goToPos(vec3(0., 4., 0.));
+	this->models.push_back(modello);
 	
 	this->resetScene();
 }
