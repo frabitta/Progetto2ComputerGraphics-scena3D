@@ -53,12 +53,22 @@ void Model::loadFromObj(const char* fileName, ShadingType shadingType) {
 	this->assingUniformsToMeshes();
 }
 
+void printMatrix(mat4 M) {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			cout << M[i][j] << " ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+}
+
 void Model::updateMatrix() {
 	mat4 model = mat4(1.0);
 	model = glm::translate(model, this->posizione);
-	model = glm::rotate(model, cos(radians(this->angolo)), this->rotation_axis);
+	model = glm::rotate(model, glm::radians(this->angolo), this->rotation_axis);
 	model = glm::scale(model, this->dimensioni);
-
+	
 	for (int i = 0; i < this->nmeshes; i++)
 	{
 		this->meshes[i]->updateModelMatrix(model);
@@ -181,4 +191,9 @@ void Model::normalizeModel() {
 			this->meshes[i]->vertices[k].z = 2.0f * (this->meshes[i]->vertices[k].z - minZ) / maxRange - 1.0f;
 		}
 	}
+}
+
+void Model::goToPos(vec3 pos) {
+	this->posizione = pos;
+	this->updateMatrix();
 }

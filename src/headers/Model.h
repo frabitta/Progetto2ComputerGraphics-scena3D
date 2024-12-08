@@ -12,8 +12,10 @@ public:
 	void loadFromObj(const char* fileName, ShadingType shadingType);
 	/* create a model from a geometry */
 	void createFromGeometry(Geometry type, vec4 colore, ShadingType shadingType);
-	/* renders the model*/
+	/* renders the model */
 	void renderModel(bool flagAncora);
+	/* moves the model */
+	void goToPos(vec3 pos);
 
 private:
 	void normalizeModel();
