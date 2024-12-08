@@ -197,3 +197,14 @@ void Model::goToPos(vec3 pos) {
 	this->posizione = pos;
 	this->updateMatrix();
 }
+
+void Model::rotate(float angle, vec3 axis) {
+	this->angolo = angle;
+	this->rotation_axis = axis;
+	this->updateMatrix();
+}
+
+void Model::scale(vec3 scale) {
+	this->dimensioni = scale;
+	this->updateMatrix();
+}

@@ -16,6 +16,10 @@ public:
 	void renderModel(bool flagAncora);
 	/* moves the model */
 	void goToPos(vec3 pos);
+	/* rotates model */
+	void rotate(float angle, vec3 axis);
+	/* scales the model */
+	void scale(vec3 scale);
 
 private:
 	void normalizeModel();

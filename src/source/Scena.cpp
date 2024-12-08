@@ -57,7 +57,6 @@ void Scena::initScene() {
 	cubo->goToPos(vec3(4.,0.,0.));
 	this->models.push_back(cubo);
 
-
 	cubo = new Model();
 	cubo->createFromGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.), ShadingType::PASS_THROUGH);
 	cubo->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
