@@ -33,6 +33,7 @@
     <ClCompile Include="src\source\inizializzazioniGL.cpp" />
     <ClCompile Include="src\source\loadMeshes_assimp.cpp" />
     <ClCompile Include="src\source\main.cpp" />
+    <ClCompile Include="src\source\Materiale.cpp" />
     <ClCompile Include="src\source\Mesh.cpp" />
     <ClCompile Include="src\source\Model.cpp" />
     <ClCompile Include="src\source\Scena.cpp" />
@@ -45,6 +46,7 @@
     <ClInclude Include="src\headers\lib.h" />
     <ClInclude Include="src\headers\Light.h" />
     <ClInclude Include="src\headers\loadMeshes_assimp.h" />
+    <ClInclude Include="src\headers\Materiale.h" />
     <ClInclude Include="src\headers\Mesh.h" />
     <ClInclude Include="src\headers\Model.h" />
     <ClInclude Include="src\headers\stb_image.h" />

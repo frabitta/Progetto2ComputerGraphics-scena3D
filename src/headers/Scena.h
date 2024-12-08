@@ -18,6 +18,8 @@ public:
 	void render(double time, bool flagWireFrame, bool flagAnchorPoints);
 	/* distrugge la scena */
 	void cleanStructure();
+	/* aggiorna la scena */
+	void update(double deltaTime);
 private:
 	// void loadShaders();
 	Camera* camera;

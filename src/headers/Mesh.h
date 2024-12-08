@@ -1,5 +1,7 @@
 #pragma once
 #include "lib.h"
+#include "Materiale.h"
+
 
 typedef enum {
     PASS_THROUGH,
@@ -9,16 +11,10 @@ typedef enum {
     GOURAUD
 } ShadingType;
 
-struct Materiale {
-    string nome;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    GLfloat shininess;
-};
-
 class Mesh {
 public:
+    Mesh();
+
     void updateModelMatrix(mat4 M);
     void renderMesh();
     void INIT_vao();

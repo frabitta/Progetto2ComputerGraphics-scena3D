@@ -22,10 +22,14 @@ int main(void) {
 
 	scena.initScene();
 	
+	double prevFrame = glfwGetTime();
 	while (!glfwWindowShouldClose(window)) {
 		double currentFrame = glfwGetTime();
-
-		scena.render(currentFrame, false, true);
+		double deltaTime = currentFrame - prevFrame;
+		scena.update(deltaTime);
+		double prevFrame = currentFrame;
+		
+		scena.render(currentFrame, false, false);
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 		/* Poll for and process events */

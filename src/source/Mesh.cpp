@@ -6,6 +6,10 @@
 
 // Implementazioni funzioni ogetto
 
+Mesh::Mesh() {
+    this->nome = "nuova mesh";
+}
+
 void Mesh::updateModelMatrix(mat4 M) {
 	this->Model = M;
 }

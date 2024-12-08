@@ -38,17 +38,15 @@ texturesino = si
 	this->loc_textureID = textureID;
 }*/
 
-void Model::loadFromObj(const char* fileName, ShadingType shadingType) {
+void Model::loadFromObj(const char* fileName, ShadingType shadingType, string name) {
 	auto path = objPath + fileName;
 	bool obj = loadAssImp(path.c_str(), this->meshes);
 	this->nmeshes = (int)this->meshes.size();
 
 	this->normalizeModel();
 	
-	for (int i = 0; i < nmeshes; i++) {
-		setupMesh(this->meshes[i], "Modello", shadingType);
-	}
-	this->initModel();
+	this->initModel(shadingType, name);
+	this->type = Type::Obj;
 }
 
 void printMatrix(mat4 M) {
@@ -81,15 +79,16 @@ void setupMesh(Mesh *mesh, string nome, ShadingType shadingType) {
 	mesh->INIT_vao();
 }
 
-void Model::createFromGeometry(Geometry type, vec4 colore, ShadingType shadingType) {
-	Mesh *mesh = new Mesh();
+/* adds a primitive to the model geometry */
+void Model::addGeometry(Geometry type, vec4 colore, vec3 posizione, float angolo, vec3 rotation_axis, vec3 dimensioni) {
+	Mesh* mesh = new Mesh();
 	switch (type) {
 	case PIANO: {
 		crea_piano(mesh, colore);
 		break;
 	}
 	case PIANO_SUDDIVISO: {
-		crea_piano_suddiviso(mesh,colore);
+		crea_piano_suddiviso(mesh, colore);
 		break;
 	}
 	case PIRAMIDE: {
@@ -118,14 +117,46 @@ void Model::createFromGeometry(Geometry type, vec4 colore, ShadingType shadingTy
 		break;
 	}
 	}
+	mat4 model = mat4(1.0);
+	model = glm::translate(model, posizione);
+	model = glm::rotate(model, glm::radians(angolo), rotation_axis);
+	model = glm::scale(model, dimensioni);
+	for (int i = 0; i < mesh->vertices.size(); i++) {
+		mesh->vertices[i] = vec3(model * vec4(mesh->vertices[i],1.));
+	}
+
 	this->meshes.push_back(mesh);
 	this->nmeshes++;
-	this->normalizeModel();
-	setupMesh(mesh, "Modello", shadingType);
-	this->initModel();
 }
 
-void Model::initModel() {
+void Model::addGeometry(Geometry type, vec4 colore) {
+	this->addGeometry(type, colore, vec3(0., 0., 0.), 0., vec3(1., 0., 0.), vec3(1., 1., 1.));
+}
+
+
+/* create a model from a geometry */
+void Model::compileGeometry(ShadingType shadingType, Materiale materiale, string name)  {
+	this->type = Type::Primitives;
+	this->normalizeModel();
+	this->initModel(shadingType, name);
+	this->setGeometryMaterial(materiale);
+}
+
+/* sets the geometry material */
+void Model::setGeometryMaterial(Materiale materiale)  {
+	if (this->type == Type::Primitives) {
+		for (int i = 0; i < nmeshes; i++) {
+			this->meshes[i]->materiale = materiale;
+		}
+	}
+}
+
+void Model::initModel(ShadingType shadingType, string nome) {
+	this->name = nome;
+	for (int i = 0; i < nmeshes; i++) {
+		setupMesh(this->meshes[i], "Modello", shadingType);
+	}
+
 	this->updateMatrix();
 	this->assingUniformsToMeshes();
 
@@ -159,11 +190,15 @@ void Model::renderModel(bool flagAncora) {
 
 	/* disegna l'ancora se richiesto*/
 	if (flagAncora) {
+		glDisable(GL_DEPTH_TEST);
+
 		glUniform1i(this->loc_uni_Shading, ShadingType::PASS_THROUGH);
 		glBindVertexArray(this->ancora_VAO);
 		glPointSize(15.0);
 		glDrawArrays(GL_POINTS, 0, 1);
 		glBindVertexArray(0);
+
+		glEnable(GL_DEPTH_TEST);
 	}
 }
 

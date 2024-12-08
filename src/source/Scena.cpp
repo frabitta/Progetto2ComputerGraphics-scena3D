@@ -3,9 +3,31 @@
 #include "Geometry.h"
 #include "Mesh.h"
 #include "lib.h"
+#include "Materiale.h"
 
 void loadShaders();
 
+
+glm::vec3 red_plastic_ambient = { 0.1, 0.0, 0.0 }, red_plastic_diffuse = { 0.6, 0.1, 0.1 }, red_plastic_specular = { 0.7, 0.6, 0.6 }; GLfloat red_plastic_shininess = 150.0f;
+Materiale mat_plasticaRossa = Materiale("Plastica rossa", red_plastic_ambient, red_plastic_diffuse, red_plastic_specular, red_plastic_shininess);
+
+glm::vec3 brass_ambient = { 0.5, 0.06, 0.015 }, brass_diffuse = { 0.78, 0.57, 0.11 }, brass_specular = { 0.99, 0.91, 0.81 }; GLfloat brass_shininess = 27.8f;
+Materiale mat_ottone = Materiale("Ottone", brass_ambient, brass_diffuse, brass_specular, brass_shininess);
+
+glm::vec3 emerald_ambient = { 0.0215, 0.04745, 0.0215 }, emerald_diffuse = { 0.07568, 0.61424, 0.07568 }, emerald_specular = { 0.633, 0.727811, 0.633 }; GLfloat emerald_shininess = 78.8f;
+Materiale mat_smeraldo = Materiale("Smeraldo", emerald_ambient, emerald_diffuse, emerald_specular, emerald_shininess);
+
+glm::vec3 snow_white_ambient = { 0.2, 0.2, 0.2 }, snow_white_diffuse = { 0.95, 0.96, 0.98 }, snow_white_specular{ 0.8, 0.8, 0.8 }; GLfloat snow_white_shininess = 1.78125f;
+Materiale mat_neve = Materiale("Neve", snow_white_ambient, snow_white_diffuse, snow_white_specular, snow_white_shininess);
+
+glm::vec3 yellow_ambient = { 0.8,	0.8,	0.0 }, yellow_diffuse = { 1.0,1.0,0.6 }, yellow_specular{ 0.9,	0.9	,0.04 }; GLfloat yellow_shininess = 1.78125f;
+Materiale mat_giallo = Materiale("Giallo", yellow_ambient, yellow_diffuse, yellow_specular, yellow_shininess);
+
+glm::vec3 pink_ambient = { 0.05f,0.0f,0.0f }, pink_diffuse = { 0.5f,0.4f,0.4f }, pink_specular{ 0.7f,0.04f,0.04f }; GLfloat pink_shininess = 1.78125f;
+Materiale mat_rosa = Materiale("Rosa", pink_ambient, pink_diffuse, pink_specular, pink_shininess);
+
+glm::vec3 brown_ambient = { 0.19125f, 0.0735f, 0.0225f }, brown_diffuse = { 0.7038f, 0.27048f, 0.0828f }, brown_specular{ 0.256777f, 0.137622f, 0.086014f }; GLfloat brown_shininess = 12.8f;
+Materiale mat_marrone = Materiale("Marrone", brown_ambient, brown_diffuse, brown_specular, brown_shininess);
 
 // Strutture locali a questa scena
 static struct {
@@ -38,15 +60,20 @@ static struct {
 static GLuint skyboxProgramId;
 static GLuint modelsProgramId;
 
+void Scena::update(double deltaTime) {
+	
+}
+
 // implementazioni della scena
 void Scena::initScene() {
 	loadShaders();
 	this->camera = new Camera();
 	this->light = new Light();
+	this->light->position = vec3(0., 0., 0.);
 
 	Model* modello = new Model();
 	// modello->createFromGeometry(Geometry::CUBO, vec4(1.,0.,0.,1.), ShadingType::PASS_THROUGH);
-	modello->loadFromObj("Shelby.obj", ShadingType::PHONG);
+	modello->loadFromObj("Shelby.obj", ShadingType::BLINN_PHONG, "Macchina");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType);
 	modello->goToPos(vec3(0., -1., -3.));
@@ -54,14 +81,16 @@ void Scena::initScene() {
 	this->models.push_back(modello);
 
 	modello = new Model();
-	modello->createFromGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.), ShadingType::PASS_THROUGH);
+	modello->addGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.));
+	modello->compileGeometry(ShadingType::PHONG, mat_giallo, "cubo1");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType);
 	modello->goToPos(vec3(4.,0.,0.));
 	this->models.push_back(modello);
 
 	modello = new Model();
-	modello->createFromGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.), ShadingType::PASS_THROUGH);
+	modello->addGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.));
+	modello->compileGeometry(ShadingType::PHONG, mat_ottone, "cubo2");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType);
 	modello->goToPos(vec3(0., 4., 0.));
@@ -84,9 +113,13 @@ Camera* Scena::getCamera() {
 }
 
 void Scena::render(double time, bool flagWireFrame, bool flagAnchorPoints) {
+	this->camera->position = vec3(10 * sin(time * 0.2), 0., 5+10*sin(time * 0.2));
+
 	// pulizia del buffer
 	glClearColor(0.305f, 0.329f, 0.651f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 
 	// Elaborazione matrici di Proiezione e Vista
 	mat4 Projection = perspective(radians(this->camera->fovY), this->camera->aspect, this->camera->near_plane, this->camera->far_plane);

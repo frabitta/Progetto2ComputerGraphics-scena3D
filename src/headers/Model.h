@@ -2,8 +2,14 @@
 #include "lib.h"
 #include "Mesh.h"
 #include "Geometry.h"
+#include "Materiale.h"
 
 extern const string objPath;
+
+enum Type {
+	Obj,
+	Primitives
+};
 
 class Model {
 public:
@@ -11,9 +17,14 @@ public:
 	void loadUniforms(GLint  mat_ambient, GLint  mat_diffuse, GLint  mat_specular, GLint  mat_shininess,
 		GLint  uni_TextureYesNo, GLint  uni_TextureLoc, GLint  uni_Model, GLint  uni_Shading);
 	/* create a model from a .obj file*/
-	void loadFromObj(const char* fileName, ShadingType shadingType);
+	void loadFromObj(const char* fileName, ShadingType shadingType, string name);
+	/* adds a primitive to the model geometry */
+	void addGeometry(Geometry type, vec4 colore);
+	void addGeometry(Geometry type, vec4 colore, vec3 posizione, float angolo, vec3 rotation_axis, vec3 dimensioni);
 	/* create a model from a geometry */
-	void createFromGeometry(Geometry type, vec4 colore, ShadingType shadingType);
+	void compileGeometry(ShadingType shadingType, Materiale materiale, string name);
+	/* sets the geometry material */
+	void setGeometryMaterial(Materiale materiale);
 	/* renders the model */
 	void renderModel(bool flagAncora);
 	/* moves the model */
@@ -27,7 +38,10 @@ private:
 	void normalizeModel();
 	void updateMatrix();
 	void assingUniformsToMeshes();
-	void initModel();
+	void initModel(ShadingType shadingType, string nome);
+
+	Type type;
+	string name;
 
 	vector<Mesh *> meshes;
 	int nmeshes = 0;
