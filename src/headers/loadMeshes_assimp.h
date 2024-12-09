@@ -1,4 +1,4 @@
 #pragma once
-#include "Mesh.h"
+#include "ModelMesh.h"
 
-bool loadAssImp(const char* path, vector<Mesh *>& mesh);
+bool loadAssImp(const char* path, vector<ModelMesh *>& mesh);

@@ -37,6 +37,11 @@ out vec2 frag_coord;    // fragment coordinate
 out int isGouraud;     // flag per il fragment di elaborare il modello d'illuminazione
 out int mixTexture;
 
+// dati da passare per campionare il riflesso dell'ambiente
+out vec3 pos;
+out vec3 cameraPos;
+out vec3 normal;
+
 float strenght = 0.1;
 
 void main()
@@ -47,15 +52,19 @@ void main()
     frag_coord = vec2(0,0);
     mixTexture = textureSi;
 
+    pos = vec3(Model*vec4(aPos, 1.0));
+    cameraPos = ViewPos;
+
+    //trasformare le normali nel vertice in esame nel sistema di coordinate di vista
+    vec3 N = normalize(transpose(inverse(mat3(View * Model))) * vertexNormal);
+    normal = N;
+
     if (shadingType == PHONG || shadingType == BLINN_PHONG) {
         //Trasformare le coordinate del vertice da elaborare (aPos) in coordinate di vista
         vec4 eyePosition = View * Model * vec4(aPos, 1.0);
 
         //Trasformiamo la posizione della luce nelle coordinate di vista
         vec4 eyeLightPos = View * vec4(light.position, 1.0);
-
-        //trasformare le normali nel vertice in esame nel sistema di coordinate di vista
-        vec3 N = normalize(transpose(inverse(mat3(View * Model))) * vertexNormal);
 
         //Calcoliamo la direzione della luce L, la direzione riflessione R e di vista
         vec3 V = normalize(ViewPos - eyePosition.xyz);

@@ -1,6 +1,6 @@
 #pragma once
 #include "lib.h"
-#include "Mesh.h"
+#include "ModelMesh.h"
 #include "Geometry.h"
 #include "Materiale.h"
 
@@ -15,7 +15,7 @@ class Model {
 public:
 	/* load uniform indices */
 	void loadUniforms(GLint  mat_ambient, GLint  mat_diffuse, GLint  mat_specular, GLint  mat_shininess,
-		GLint  uni_TextureYesNo, GLint  uni_TextureLoc, GLint  uni_Model, GLint  uni_Shading);
+		GLint  uni_TextureYesNo, GLint  uni_TextureLoc, GLint  uni_Model, GLint  uni_Shading, GLint uni_ambientReflectance);
 	/* create a model from a .obj file*/
 	void loadFromObj(const char* fileName, ShadingType shadingType, string name);
 	/* adds a primitive to the model geometry */
@@ -35,6 +35,12 @@ public:
 	void scale(vec3 scale);
 	/* set the shading of the model */
 	void setShading(ShadingType shadingType);
+	/* sets a texture for the model */
+	void setTexture(bool activate, GLuint id);
+	/* sets a texture for a mesh of the model: idx index of the mesh */
+	void setTexture(bool activate, GLuint id, int idx);
+	/* sets the reflectance of the model */;
+	void setReflectance(float reflectance);
 
 private:
 	void normalizeModel();
@@ -45,7 +51,7 @@ private:
 	Type type;
 	string name;
 
-	vector<Mesh *> meshes;
+	vector<ModelMesh*> meshes;
 	int nmeshes = 0;
 	vec3 posizione = vec3(0.,0.,0.);
 	float angolo = 0.f;
@@ -60,4 +66,5 @@ private:
 	GLint  loc_uni_mat_ambient, loc_uni_mat_diffuse, loc_uni_mat_specular, loc_uni_mat_shininess;
 	GLint  loc_uni_TextureYesNo, loc_uni_TextureLoc;
 	GLint  loc_uni_Model, loc_uni_Shading;
+	GLint loc_uni_ambientReflectance;
 };

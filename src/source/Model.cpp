@@ -1,7 +1,7 @@
 #include "Model.h"
 #include "loadMeshes_assimp.h"
 
-void setupMesh(Mesh* mesh, string nome, ShadingType shadingType);
+void setupMesh(ModelMesh* mesh, string nome, ShadingType shadingType);
 
 const vec4 COLORE_ANCORA = vec4(0.0, 1.0, 0.0, 1.0);
 
@@ -15,12 +15,12 @@ void Model::assingUniformsToMeshes() {
 		this->meshes[i]->uni_TextureLoc = this->loc_uni_TextureLoc;
 		this->meshes[i]->uni_Model = this->loc_uni_Model;
 		this->meshes[i]->uni_Shading = this->loc_uni_Shading;
-		// this->meshes[i].textureID = this->loc_textureID;
+		this->meshes[i]->uni_ambientReflectance = this->loc_uni_ambientReflectance;
 	}
 }
 
 void Model::loadUniforms(GLint  mat_ambient, GLint  mat_diffuse, GLint  mat_specular, GLint  mat_shininess,
-	GLint  uni_TextureYesNo, GLint  uni_TextureLoc, GLint  uni_Model, GLint  uni_Shading) {
+	GLint  uni_TextureYesNo, GLint  uni_TextureLoc, GLint  uni_Model, GLint  uni_Shading, GLint uni_ambientReflectance) {
 	this->loc_uni_mat_ambient = mat_ambient;
 	this->loc_uni_mat_diffuse = mat_diffuse;
 	this->loc_uni_mat_specular = mat_specular;
@@ -29,6 +29,7 @@ void Model::loadUniforms(GLint  mat_ambient, GLint  mat_diffuse, GLint  mat_spec
 	this->loc_uni_TextureLoc = uni_TextureLoc;
 	this->loc_uni_Model = uni_Model;
 	this->loc_uni_Shading = uni_Shading;
+	this->loc_uni_ambientReflectance = uni_ambientReflectance;
 	this->assingUniformsToMeshes();
 }
 
@@ -73,15 +74,15 @@ void Model::updateMatrix() {
 	this->ancora_world = model * vec4(this->ancora,1.);
 }
 
-void setupMesh(Mesh *mesh, string nome, ShadingType shadingType) {
+void setupMesh(ModelMesh *mesh, string nome, ShadingType shadingType) {
 	mesh->nome = nome;
 	mesh->shading = shadingType;
-	mesh->INIT_vao();
+	mesh->INIT_VAO();
 }
 
 /* adds a primitive to the model geometry */
 void Model::addGeometry(Geometry type, vec4 colore, vec3 posizione, float angolo, vec3 rotation_axis, vec3 dimensioni) {
-	Mesh* mesh = new Mesh();
+	ModelMesh* mesh = new ModelMesh();
 	switch (type) {
 	case PIANO: {
 		crea_piano(mesh, colore);
@@ -185,7 +186,7 @@ void Model::initModel(ShadingType shadingType, string nome) {
 
 void Model::renderModel(bool flagAncora) {
 	for (int i = 0; i < this->meshes.size(); i++) {
-		this->meshes[i]->renderMesh();
+		this->meshes[i]->render();
 	}
 
 	/* disegna l'ancora se richiesto*/
@@ -291,4 +292,22 @@ void Model::rotate(float angle, vec3 axis) {
 void Model::scale(vec3 scale) {
 	this->dimensioni = scale;
 	this->updateMatrix();
+}
+
+void Model::setTexture(bool activate, GLuint id) {
+	for (int i = 0; i < this->nmeshes; i++) {
+		this->meshes[i]->putTexture(activate, id);
+	}
+}
+
+void Model::setTexture(bool activate, GLuint id, int idx) {
+	if (idx < this->nmeshes) {
+		this->meshes[idx]->putTexture(activate, id);
+	}
+}
+
+void Model::setReflectance(float reflectance) {
+	for (int i = 0; i < this->nmeshes; i++) {
+		this->meshes[i]->mat_reflectance = reflectance;
+	}
 }

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\headers\Scena.h" />
+    <ClCompile Include="src\headers\Skybox.h" />
     <ClCompile Include="src\imgui\imgui.cpp" />
     <ClCompile Include="src\imgui\imgui_demo.cpp" />
     <ClCompile Include="src\imgui\imgui_draw.cpp" />
@@ -30,24 +31,29 @@
     <ClCompile Include="src\source\Camera.cpp" />
     <ClCompile Include="src\source\Geometry.cpp" />
     <ClCompile Include="src\source\glad.c" />
+    <ClCompile Include="src\source\Gui.cpp" />
     <ClCompile Include="src\source\inizializzazioniGL.cpp" />
     <ClCompile Include="src\source\loadMeshes_assimp.cpp" />
     <ClCompile Include="src\source\main.cpp" />
     <ClCompile Include="src\source\Materiale.cpp" />
     <ClCompile Include="src\source\Mesh.cpp" />
+    <ClCompile Include="src\source\ModelMesh.cpp" />
     <ClCompile Include="src\source\Model.cpp" />
     <ClCompile Include="src\source\Scena.cpp" />
     <ClCompile Include="src\source\Light.cpp" />
+    <ClCompile Include="src\source\Skybox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\headers\Camera.h" />
     <ClInclude Include="src\headers\Geometry.h" />
+    <ClInclude Include="src\headers\Gui.h" />
     <ClInclude Include="src\headers\inizializzazioniGL.h" />
     <ClInclude Include="src\headers\lib.h" />
     <ClInclude Include="src\headers\Light.h" />
     <ClInclude Include="src\headers\loadMeshes_assimp.h" />
     <ClInclude Include="src\headers\Materiale.h" />
     <ClInclude Include="src\headers\Mesh.h" />
+    <ClInclude Include="src\headers\ModelMesh.h" />
     <ClInclude Include="src\headers\Model.h" />
     <ClInclude Include="src\headers\stb_image.h" />
     <ClInclude Include="src\imgui\imconfig.h" />
@@ -64,6 +70,18 @@
     <None Include="packages.config" />
     <None Include="src\shaders\model_fragment.glsl" />
     <None Include="src\shaders\model_vertex.glsl" />
+    <None Include="src\shaders\sky_fragment.glsl" />
+    <None Include="src\shaders\sky_vertex.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\textures\bandiera_italiana.jpg" />
+    <Image Include="resources\textures\grey-cement.jpg" />
+    <Image Include="resources\textures\jim.jpg" />
+    <Image Include="resources\textures\mickey-mouse.jpg" />
+    <Image Include="resources\textures\mickey-mouse.png" />
+    <Image Include="resources\textures\muromattoni.jpg" />
+    <Image Include="resources\textures\steve.jpg" />
+    <Image Include="resources\textures\texture_mare.jpg" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

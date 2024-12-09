@@ -56,12 +56,12 @@ int INIT_Cubemap(string fileName) {
 	string imagePath = cubeMapPath + fileName;
 	int cubemapTexture;
 	vector<std::string> faces {
-		imagePath + "posx.jpg",		// right
-		imagePath + "negx.jpg",		// left
-		imagePath + "posy.jpg",		// top
-		imagePath + "negy.jpg",		// bottom
-		imagePath + "posz.jpg",		// front
-		imagePath + "negz.jpg"};	// back
+		imagePath + "/posx.jpg",		// right
+		imagePath + "/negx.jpg",		// left
+		imagePath + "/posy.jpg",		// top
+		imagePath + "/negy.jpg",		// bottom
+		imagePath + "/posz.jpg",		// front
+		imagePath + "/negz.jpg"};	// back
 	return cubemapTexture = loadCubemap(faces, 0);
 }
 
@@ -160,6 +160,7 @@ unsigned int loadTexture(char const* path, int flip) {
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

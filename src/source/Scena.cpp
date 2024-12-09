@@ -1,12 +1,11 @@
 #include "inizializzazioniGL.h"
 #include "Scena.h"
 #include "Geometry.h"
-#include "Mesh.h"
-#include "lib.h"
 #include "Materiale.h"
+#include "Skybox.h"
+#include "lib.h"
 
 void loadShaders();
-
 
 glm::vec3 red_plastic_ambient = { 0.1, 0.0, 0.0 }, red_plastic_diffuse = { 0.6, 0.1, 0.1 }, red_plastic_specular = { 0.7, 0.6, 0.6 }; GLfloat red_plastic_shininess = 150.0f;
 Materiale mat_plasticaRossa = Materiale("Plastica rossa", red_plastic_ambient, red_plastic_diffuse, red_plastic_specular, red_plastic_shininess);
@@ -28,6 +27,7 @@ Materiale mat_rosa = Materiale("Rosa", pink_ambient, pink_diffuse, pink_specular
 
 glm::vec3 brown_ambient = { 0.19125f, 0.0735f, 0.0225f }, brown_diffuse = { 0.7038f, 0.27048f, 0.0828f }, brown_specular{ 0.256777f, 0.137622f, 0.086014f }; GLfloat brown_shininess = 12.8f;
 Materiale mat_marrone = Materiale("Marrone", brown_ambient, brown_diffuse, brown_specular, brown_shininess);
+
 
 // Strutture locali a questa scena
 static struct {
@@ -55,10 +55,18 @@ static struct {
 	GLint  ambient;
 	GLint  specular;
 	GLint  shininess;
+	GLint ambientReflectance;
 } uni_material;
 
 static GLuint skyboxProgramId;
 static GLuint modelsProgramId;
+
+string skyboxCubemap = "field";
+Skybox sky;
+GLint skybox_uni_proj;
+GLint skybox_uni_view;
+const char* skyVertex = "sky_vertex.glsl";
+const char* skyFragment = "sky_fragment.glsl";
 
 void Scena::update(double deltaTime) {
 	
@@ -68,31 +76,52 @@ void Scena::update(double deltaTime) {
 void Scena::initScene() {
 	loadShaders();
 	this->camera = new Camera();
-	this->light = new Light();
-	this->light->position = vec3(0., 0., 0.);
+	this->light1 = new Light();
+	this->light1->position = vec3(0., 0., 0.);
+	this->light1->color = vec3(1., 0., 0.);
+	this->light1->power = 100.;
+
+	sky.createSkybox(skyboxCubemap);
+	skyboxProgramId = INIT_shaderProg(skyVertex, skyFragment);
+	glUseProgram(skyboxProgramId);
+	skybox_uni_proj = glGetUniformLocation(skyboxProgramId, "Proj");
+	skybox_uni_view = glGetUniformLocation(skyboxProgramId, "View");
+	glUseProgram(modelsProgramId);
+	glUniform1i(glGetUniformLocation(modelsProgramId, "skybox"),sky.cubemap);
 
 	Model* modello = new Model();
-	// modello->createFromGeometry(Geometry::CUBO, vec4(1.,0.,0.,1.), ShadingType::PASS_THROUGH);
 	modello->loadFromObj("Shelby.obj", ShadingType::BLINN_PHONG, "Macchina");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
-		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType);
-	modello->goToPos(vec3(0., -1., -3.));
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance);
+	modello->goToPos(vec3(0., 0., -3.));
 	modello->scale(vec3(3., 3., 3.));
+	modello->setReflectance(0.8);
+	this->models.push_back(modello);
+
+	modello = new Model();
+	modello->addGeometry(Geometry::PIANO_SUDDIVISO, vec4(1., 0., 0., 1.));
+	modello->compileGeometry(ShadingType::PHONG, mat_marrone, "terra");
+	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance);
+	modello->goToPos(vec3(0., -3., 0.));
+	modello->scale(vec3(200., 1., 200.));
 	this->models.push_back(modello);
 
 	modello = new Model();
 	modello->addGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.));
-	modello->compileGeometry(ShadingType::PHONG, mat_giallo, "cubo1");
+	modello->compileGeometry(ShadingType::BLINN_PHONG, mat_ottone, "cubo1");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
-		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType);
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance);
 	modello->goToPos(vec3(4.,0.,0.));
+	// modello->setTexture(true, texture);
 	this->models.push_back(modello);
+	
 
 	modello = new Model();
 	modello->addGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.));
-	modello->compileGeometry(ShadingType::PHONG, mat_ottone, "cubo2");
+	modello->compileGeometry(ShadingType::BLINN_PHONG, mat_plasticaRossa, "cubo2");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
-		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType);
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance);
 	modello->goToPos(vec3(0., 4., 0.));
 	this->models.push_back(modello);
 	
@@ -101,7 +130,7 @@ void Scena::initScene() {
 
 void Scena::resetScene() {
 	this->camera->initCamera();
-	this->light->initLight();
+	this->light1->initLight();
 }
 
 vector<Model*> Scena::getModels() {
@@ -112,9 +141,13 @@ Camera* Scena::getCamera() {
 	return this->camera;
 }
 
+Light* Scena::getLight1() {
+	return this->light1;
+}
+
 void Scena::render(double time, bool flagWireFrame, bool flagAnchorPoints) {
 	this->camera->position = vec3(10 * sin(time * 0.2), 0., 5+10*sin(time * 0.2));
-
+	
 	// pulizia del buffer
 	glClearColor(0.305f, 0.329f, 0.651f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -126,18 +159,11 @@ void Scena::render(double time, bool flagWireFrame, bool flagAnchorPoints) {
 	mat4 View = lookAt(vec3(this->camera->position), vec3(this->camera->target), vec3(this->camera->upVector));
 
 	// stampa della skybox
-	/*
-	glDepthMask(GL_FALSE);
-	glUseProgram(programId1);
-	glUniform1i(glGetUniformLocation(programId1, "skybox"), 0);
-	glUniformMatrix4fv(uniform.MatProjS, 1, GL_FALSE, value_ptr(Projection));
-	glUniformMatrix4fv(uniform.MatViewS, 1, GL_FALSE, value_ptr(View));
-	glBindVertexArray(sky.VAO);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-	glDrawElements(GL_TRIANGLES, sky.indices.size() * sizeof(GLuint), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-	glDepthMask(GL_TRUE);
-	*/
+	glUseProgram(skyboxProgramId);
+	glUniform1i(glGetUniformLocation(skyboxProgramId, "skybox"), 0);
+	glUniformMatrix4fv(skybox_uni_proj, 1, GL_FALSE, value_ptr(Projection));
+	glUniformMatrix4fv(skybox_uni_view, 1, GL_FALSE, value_ptr(View));
+	sky.render();
 
 	/* preparazione program shader per i modelli
 	* - tempo
@@ -147,6 +173,8 @@ void Scena::render(double time, bool flagWireFrame, bool flagAnchorPoints) {
 	* - telecamera
 	*/
 	glUseProgram(modelsProgramId);
+	glUniform1i(glGetUniformLocation(modelsProgramId, "skybox"), 0);
+
 	glUniform1f(uni_trans.time, (float)time);
 	glUniformMatrix4fv(uni_trans.View, 1, GL_FALSE, value_ptr(View));
 	glUniformMatrix4fv(uni_trans.Projection, 1, GL_FALSE, value_ptr(Projection));
@@ -155,9 +183,9 @@ void Scena::render(double time, bool flagWireFrame, bool flagAnchorPoints) {
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glUniform3f(uni_trans.ViewPos, this->camera->position.x, this->camera->position.y, this->camera->position.z);
-	glUniform3f(uni_light.position, this->light->position.x, this->light->position.y, this->light->position.z);
-	glUniform3f(uni_light.color, this->light->color.x, this->light->color.y, this->light->color.z);
-	glUniform1f(uni_light.power, this->light->power);
+	glUniform3f(uni_light.position, this->light1->position.x, this->light1->position.y, this->light1->position.z);
+	glUniform3f(uni_light.color, this->light1->color.x, this->light1->color.y, this->light1->color.z);
+	glUniform1f(uni_light.power, this->light1->power);
 
 	// renderign dei singoli modelli -> delle singole mesh
 	unsigned int nModels = (unsigned int)this->models.size();
@@ -191,6 +219,7 @@ void loadShaders() {
 	uni_material.ambient = glGetUniformLocation(modelsProgramId, "material.ambient");
 	uni_material.specular = glGetUniformLocation(modelsProgramId, "material.specular");
 	uni_material.shininess = glGetUniformLocation(modelsProgramId, "material.shininess");
+	uni_material.ambientReflectance = glGetUniformLocation(modelsProgramId, "reflectance");
 }
 
 void Scena::cleanStructure() {
@@ -199,4 +228,3 @@ void Scena::cleanStructure() {
 		delete(this->models[i]);
 	}
 }
-

@@ -3,7 +3,7 @@
 #include <assimp/postprocess.h>     // Post processing flags
 #include "loadMeshes_assimp.h"
 
-bool loadAssImp(const char* path, vector<Mesh *>& mymesh)
+bool loadAssImp(const char* path, vector<ModelMesh*>& mymesh)
 {
 	Assimp::Importer importer;
 
@@ -19,7 +19,7 @@ bool loadAssImp(const char* path, vector<Mesh *>& mymesh)
 	unsigned int num_meshes = scene->mNumMeshes;  //Numero di oggetti che compongono il modello
 	// mymesh.resize(num_meshes);  //Faccio il resize di mymesh al numero di mesh che compongono l'oggetto
 	for (unsigned int i = 0; i < num_meshes; i++) {
-		mymesh.push_back(new Mesh());
+		mymesh.push_back(new ModelMesh());
 	}
 
 	for (unsigned int nm = 0; nm < num_meshes; nm++)
