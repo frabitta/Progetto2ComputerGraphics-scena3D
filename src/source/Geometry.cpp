@@ -51,14 +51,14 @@ void crea_cubo(Mesh* mesh, vec4 colore)
 	mesh->indices.push_back(6); mesh->indices.push_back(7); mesh->indices.push_back(3);
 
 	// normali
-	mesh->normals.push_back(normalize(vec3(0, 0, 1)));
-	mesh->normals.push_back(normalize(vec3(0, 0, 1)));
-	mesh->normals.push_back(normalize(vec3(0, 0, 1)));
-	mesh->normals.push_back(normalize(vec3(0, 0, 1)));
-	mesh->normals.push_back(normalize(vec3(0, 0, -1)));
-	mesh->normals.push_back(normalize(vec3(0, 0, -1)));
-	mesh->normals.push_back(normalize(vec3(0, 0, -1)));
-	mesh->normals.push_back(normalize(vec3(0, 0, -1)));
+	mesh->normals.push_back(normalize(vec3(-1, -1, 1)));
+	mesh->normals.push_back(normalize(vec3(1, -1, 1)));
+	mesh->normals.push_back(normalize(vec3(1, 1, 1)));
+	mesh->normals.push_back(normalize(vec3(-1, 1, 1)));
+	mesh->normals.push_back(normalize(vec3(-1, -1, -1)));
+	mesh->normals.push_back(normalize(vec3(1, -1, -1)));
+	mesh->normals.push_back(normalize(vec3(1, 1, -1)));
+	mesh->normals.push_back(normalize(vec3(-1, 1, -1)));
 
 	unsigned int nv = (unsigned int)mesh->vertices.size();
 	mesh->indices.push_back(nv - 1);
