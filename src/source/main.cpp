@@ -5,10 +5,7 @@
 #include "Model.h"
 #include "Light.h"
 #include "Camera.h"
-// #include "eventManager.h"
-
-// Dichiarazione funzioni locali
-
+#include "eventManager.h"
 
 // Variabili Globali
 const string shaderPath = "src/shaders/";
@@ -16,8 +13,8 @@ const string texturePath = "resources/textures/";
 const string cubeMapPath = "resources/cubeMaps/";
 const string objPath = "resources/models/";
 
-const int height = 900;
-const int width = 1600;
+int height;
+int width;
 GLFWwindow* window;
 
 Light* light1;
@@ -29,6 +26,9 @@ bool flagAncora = false;
 // Main
 int main(void) {
 	Scena scena;
+	height = 900;
+	width = 1600;
+
 	INIT_finestraOpenGL(window, height, width);
 
 	scena.initScene();
@@ -36,7 +36,7 @@ int main(void) {
 	camera = scena.getCamera();
 	models = scena.getModels();
 
-	// setupCallbacks(window);
+	setupCallbacks(window);
 
 	Initialize_IMGUI(window);
 

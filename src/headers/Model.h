@@ -42,24 +42,23 @@ public:
 	/* sets the reflectance of the model */;
 	void setReflectance(float reflectance);
 
+	vec4 ancora_world;
+	string name;
+	Type type;
+	vec3 posizione = vec3(0.,0.,0.);
+	float angolo = 0.f;
+	vec3 rotation_axis = vec3(0.,1.,0.);
+	vec3 dimensioni = vec3(1.,1.,1.);
+
 private:
 	void normalizeModel();
 	void updateMatrix();
 	void assingUniformsToMeshes();
 	void initModel(ShadingType shadingType, string nome);
 
-	Type type;
-	string name;
-
 	vector<ModelMesh*> meshes;
 	int nmeshes = 0;
-	vec3 posizione = vec3(0.,0.,0.);
-	float angolo = 0.f;
-	vec3 rotation_axis = vec3(0.,1.,0.);
-	vec3 dimensioni = vec3(1.,1.,1.);
-
 	vec3 ancora = vec3(0., 0., 0.); // Punto di ancoraggio del modello locale
-	vec4 ancora_world;
 	GLuint ancora_VAO;
 	GLuint ancora_VBO;
 

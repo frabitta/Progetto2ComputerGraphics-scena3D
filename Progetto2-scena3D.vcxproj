@@ -29,6 +29,7 @@
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\source\Camera.cpp" />
+    <ClCompile Include="src\source\eventManager.cpp" />
     <ClCompile Include="src\source\Geometry.cpp" />
     <ClCompile Include="src\source\glad.c" />
     <ClCompile Include="src\source\Gui.cpp" />
@@ -45,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\headers\Camera.h" />
+    <ClInclude Include="src\headers\eventManager.h" />
     <ClInclude Include="src\headers\Geometry.h" />
     <ClInclude Include="src\headers\Gui.h" />
     <ClInclude Include="src\headers\inizializzazioniGL.h" />

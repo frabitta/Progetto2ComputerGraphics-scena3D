@@ -61,6 +61,10 @@ static struct {
 static GLuint skyboxProgramId;
 static GLuint modelsProgramId;
 
+mat4 Projection = mat4(1.0);
+mat4 View = mat4(1.0);
+
+
 string skyboxCubemap = "field";
 Skybox sky;
 GLint skybox_uni_proj;
@@ -155,8 +159,8 @@ void Scena::render(double time, bool flagWireFrame, bool flagAnchorPoints) {
 	glDepthMask(GL_TRUE);
 
 	// Elaborazione matrici di Proiezione e Vista
-	mat4 Projection = perspective(radians(this->camera->fovY), this->camera->aspect, this->camera->near_plane, this->camera->far_plane);
-	mat4 View = lookAt(vec3(this->camera->position), vec3(this->camera->target), vec3(this->camera->upVector));
+	Projection = perspective(radians(this->camera->fovY), this->camera->aspect, this->camera->near_plane, this->camera->far_plane);
+	View = lookAt(vec3(this->camera->position), vec3(this->camera->target), vec3(this->camera->upVector));
 
 	// stampa della skybox
 	glUseProgram(skyboxProgramId);
