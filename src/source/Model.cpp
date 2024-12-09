@@ -202,6 +202,12 @@ void Model::renderModel(bool flagAncora) {
 	}
 }
 
+void Model::setShading(ShadingType shadingType) {
+	for (int i = 0; i < nmeshes; i++) {
+		this->meshes[i]->shading = shadingType;
+	}
+}
+
 void Model::normalizeModel() {
 	int i, k;
 	unsigned int nmeshes = (unsigned int)this->meshes.size();

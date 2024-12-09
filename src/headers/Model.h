@@ -33,6 +33,8 @@ public:
 	void rotate(float angle, vec3 axis);
 	/* scales the model */
 	void scale(vec3 scale);
+	/* set the shading of the model */
+	void setShading(ShadingType shadingType);
 
 private:
 	void normalizeModel();
