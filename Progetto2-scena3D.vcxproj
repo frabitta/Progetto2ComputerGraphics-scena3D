@@ -28,6 +28,7 @@
     <ClCompile Include="src\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\source\BoundingBox.cpp" />
     <ClCompile Include="src\source\Camera.cpp" />
     <ClCompile Include="src\source\eventManager.cpp" />
     <ClCompile Include="src\source\Geometry.cpp" />
@@ -45,6 +46,7 @@
     <ClCompile Include="src\source\Skybox.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\headers\BoundingBox.h" />
     <ClInclude Include="src\headers\Camera.h" />
     <ClInclude Include="src\headers\eventManager.h" />
     <ClInclude Include="src\headers\Geometry.h" />

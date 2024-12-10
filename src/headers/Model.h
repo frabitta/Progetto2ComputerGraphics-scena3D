@@ -3,6 +3,7 @@
 #include "ModelMesh.h"
 #include "Geometry.h"
 #include "Materiale.h"
+#include "BoundingBox.h"
 
 extern const string objPath;
 
@@ -41,6 +42,8 @@ public:
 	void setTexture(bool activate, GLuint id, int idx);
 	/* sets the reflectance of the model */;
 	void setReflectance(float reflectance);
+	/* checks if a point collides */
+	bool checkCollision(vec3 p);
 
 	vec4 ancora_world;
 	string name;
@@ -66,4 +69,6 @@ private:
 	GLint  loc_uni_TextureYesNo, loc_uni_TextureLoc;
 	GLint  loc_uni_Model, loc_uni_Shading;
 	GLint loc_uni_ambientReflectance;
+
+	BoundingBox bb;
 };

@@ -6,6 +6,8 @@
 #include "lib.h"
 
 void loadShaders();
+/* returns true if camera collides with a model */
+bool checkCollision(vec3 p, vector<Model *> models);
 
 glm::vec3 red_plastic_ambient = { 0.1, 0.0, 0.0 }, red_plastic_diffuse = { 0.6, 0.1, 0.1 }, red_plastic_specular = { 0.7, 0.6, 0.6 }; GLfloat red_plastic_shininess = 150.0f;
 Materiale mat_plasticaRossa = Materiale("Plastica rossa", red_plastic_ambient, red_plastic_diffuse, red_plastic_specular, red_plastic_shininess);
@@ -88,10 +90,15 @@ void Scena::update(double deltaTime) {
 		if (movementVector != vec3(0.,0.,0.)) {
 			movementVector = normalize(movementVector) * speed;
 		}
-		this->camera->position += movementVector;
-		camera->target = camera->position + camera->direction; //aggiorno il punto in cui guarda la telecamera
+		
+		vec3 nextPos = this->camera->position + movementVector;
+		if (!checkCollision(nextPos, this->models)) {
+			this->camera->position = nextPos;
+			camera->target = camera->position + camera->direction; //aggiorno il punto in cui guarda la telecamera
+		}
 	}
 }
+
 
 // implementazioni della scena
 void Scena::initScene() {
@@ -248,4 +255,14 @@ void Scena::cleanStructure() {
 	for (int i = 0; i < this->models.size(); i++) {
 		delete(this->models[i]);
 	}
+}
+
+bool checkCollision(vec3 p, vector<Model *> models) {
+	bool collided = false;
+
+	for (int i = 0; !collided && i < models.size(); i++) {
+		collided = models[i]->checkCollision(p);
+	}
+
+	return collided;
 }

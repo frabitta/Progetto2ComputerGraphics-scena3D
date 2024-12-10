@@ -66,11 +66,17 @@ void Model::updateMatrix() {
 	model = glm::rotate(model, glm::radians(this->angolo), this->rotation_axis);
 	model = glm::scale(model, this->dimensioni);
 	
+	vector<vec3> verticesList;
 	for (int i = 0; i < this->nmeshes; i++)
 	{
 		this->meshes[i]->updateModelMatrix(model);
+		vector<vec3> vert = this->meshes[i]->vertices;
+		for (int j = 0; j < vert.size(); j++) {
+			vec4 worldV = model * vec4(vert[j], 1.);
+			verticesList.push_back(vec3(worldV));
+		}
 	}
-
+	this->bb.generateFromVertices(verticesList);
 	this->ancora_world = model * vec4(this->ancora,1.);
 }
 
@@ -181,7 +187,6 @@ void Model::initModel(ShadingType shadingType, string nome) {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vec4), &colore, GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(1);
-
 }
 
 void Model::renderModel(bool flagAncora) {
@@ -310,4 +315,8 @@ void Model::setReflectance(float reflectance) {
 	for (int i = 0; i < this->nmeshes; i++) {
 		this->meshes[i]->mat_reflectance = reflectance;
 	}
+}
+
+bool Model::checkCollision(vec3 p) {
+	return this->bb.checkCollision(p);
 }
