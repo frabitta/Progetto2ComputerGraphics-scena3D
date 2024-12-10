@@ -3,6 +3,7 @@
 #include "Gui.h"
 #include "Model.h"
 
+/* extern variables */
 extern Camera* camera;
 extern vector<Model*> models;
 extern int height;
@@ -10,8 +11,15 @@ extern int width;
 extern mat4 Projection;
 extern mat4 View;
 
+/* selezione */
 int selected_obj = -1;
 float raggio_sfera = 1.;
+
+/* navigazione */
+bool navigating = false;
+int mov_x = 0;
+int mov_y = 0;
+int mov_z = 0;
 
 
 vec3 get_ray_from_mouse(float mouse_x, float mouse_y);
@@ -20,10 +28,12 @@ bool ray_sphere(vec3 O, vec3 d, vec3 sphere_centre_wor, float sphere_radius, flo
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 void setupCallbacks(GLFWwindow* window) {
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+    glfwSetKeyCallback(window, key_callback);
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -45,8 +55,10 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
                     }
                 }
             }
-            if (selected_obj > -1)
-                cout << "Oggetto selezionato" << models[selected_obj]->name.c_str() << endl;
+            if (selected_obj > -1) {
+                navigating = false;
+                // cout << "Oggetto selezionato: " << models[selected_obj]->name.c_str() << endl;
+            }
         }
 	}
 }
@@ -60,6 +72,80 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	else if (camera->fovY > 150) {
 		camera->fovY = 150;
 	}
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_N && action == GLFW_PRESS) {
+        navigating = !navigating;
+        if (navigating) {
+            mov_x = 0;
+            mov_y = 0;
+            mov_z = 0;
+            selected_obj = -1;
+        }
+    }
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        if (navigating) {
+            navigating = false;
+        }
+        if (selected_obj != -1) {
+            selected_obj = -1;
+        }
+    }
+
+    if (navigating) {
+        if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+            mov_z--;
+        }
+        if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
+            mov_z++;
+        }
+
+        if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+            mov_z++;
+        }
+        if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
+            mov_z--;
+        }
+
+        if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+            mov_x++;
+        }
+        if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
+            mov_x--;
+        }
+
+        if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+            mov_x--;
+        }
+        if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
+            mov_x++;
+        }
+
+        if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+            mov_x++;
+        }
+        if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
+            mov_x--;
+        }
+
+        if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_PRESS) {
+            mov_y--;
+        }
+        if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_RELEASE) {
+            mov_y++;
+        }
+
+        if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+            mov_y++;
+        }
+        if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
+            mov_y--;
+        }
+    }
+
 }
 
 

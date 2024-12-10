@@ -4,14 +4,23 @@
 #include "Camera.h"
 #include "Materiale.h"
 
+/* scena globale */
 extern Light* light1;
 extern Camera* camera;
 extern vector<Model*> models;
 extern bool flagWF;
 extern bool flagAncora;
+/* menu globale */
+float posL1[3];
+float coloreL1[3];
 
+/* selezione */
 extern int selected_obj;
 
+/* navigazione */
+extern bool navigating;
+
+/* materiali */
 extern Materiale mat_plasticaRossa;
 extern Materiale mat_ottone;
 extern Materiale mat_smeraldo;
@@ -19,9 +28,6 @@ extern Materiale mat_neve;
 extern Materiale mat_giallo;
 extern Materiale mat_rosa;
 extern Materiale mat_marrone;
-
-float posL1[3];
-float coloreL1[3];
 
 void Initialize_IMGUI(GLFWwindow* window) {
     IMGUI_CHECKVERSION(); // Verifica la compatibilità della versione di ImGui
@@ -160,6 +166,20 @@ void my_interface(GLFWwindow* window) {
             }
         }
 
+        ImGui::End();
+    }
+
+    if (navigating) {
+        ImVec2 windowSize = ImGui::GetIO().DisplaySize;
+        ImVec2 windowPos = ImVec2(windowSize.x * 0.05f, windowSize.y * 0.96f);
+        ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
+        // ImGui::SetNextWindowSize({ 100.0f, 30.0f });
+        ImGui::Begin("Navigazione", NULL,
+            ImGuiWindowFlags_NoResize | //   Impedisce all'utente di ridimensionare la finestra.
+            ImGuiWindowFlags_AlwaysAutoResize |  //La finestra si ridimensionerà automaticamente per adattarsi al contenuto. 
+            ImGuiWindowFlags_NoTitleBar |    //Nasconde la barra del titolo della finestra.
+            ImGuiWindowFlags_NoMove);
+        ImGui::Text("Navigating","");
         ImGui::End();
     }
 
