@@ -79,7 +79,18 @@ extern int mov_y;
 extern int mov_z;
 
 void Scena::update(double deltaTime) {
-	
+	if (navigating) {
+		float speed = 0.3;
+		vec3 movementVector = vec3(0., 0., 0.);
+		movementVector += normalize(this->camera->upVector) * (float)mov_y;
+		movementVector += normalize(this->camera->direction) * -(float)mov_z;
+		movementVector += normalize(vec3(-this->camera->direction.z, 0, this->camera->direction.x)) * (float)mov_x;
+		if (movementVector != vec3(0.,0.,0.)) {
+			movementVector = normalize(movementVector) * speed;
+		}
+		this->camera->position += movementVector;
+		camera->target = camera->position + camera->direction; //aggiorno il punto in cui guarda la telecamera
+	}
 }
 
 // implementazioni della scena
