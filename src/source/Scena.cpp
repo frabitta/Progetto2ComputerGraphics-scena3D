@@ -64,13 +64,19 @@ static GLuint modelsProgramId;
 mat4 Projection = mat4(1.0);
 mat4 View = mat4(1.0);
 
-
+/* sky */
 string skyboxCubemap = "field";
 Skybox sky;
 GLint skybox_uni_proj;
 GLint skybox_uni_view;
 const char* skyVertex = "sky_vertex.glsl";
 const char* skyFragment = "sky_fragment.glsl";
+
+/* camera movement */
+extern bool navigating;
+extern int mov_x;
+extern int mov_y;
+extern int mov_z;
 
 void Scena::update(double deltaTime) {
 	
@@ -150,7 +156,7 @@ Light* Scena::getLight1() {
 }
 
 void Scena::render(double time, bool flagWireFrame, bool flagAnchorPoints) {
-	this->camera->position = vec3(10 * sin(time * 0.2), 0., 5+10*sin(time * 0.2));
+	// this->camera->position = vec3(10 * sin(time * 0.2), 0., 5+10*sin(time * 0.2));
 	
 	// pulizia del buffer
 	glClearColor(0.305f, 0.329f, 0.651f, 1.f);

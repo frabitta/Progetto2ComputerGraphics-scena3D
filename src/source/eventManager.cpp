@@ -20,18 +20,29 @@ bool navigating = false;
 int mov_x = 0;
 int mov_y = 0;
 int mov_z = 0;
+double off_xpos;
+double off_ypos;
 
+GLFWwindow* this_window;
 
 vec3 get_ray_from_mouse(float mouse_x, float mouse_y);
 bool ray_sphere(vec3 O, vec3 d, vec3 sphere_centre_wor, float sphere_radius, float* intersection_distance);
-
+void exitFromNavigation();
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
+int center_x;
+int center_y;
+
 void setupCallbacks(GLFWwindow* window) {
+    this_window = window;
+    center_x = floor((float)width * 0.5);
+    center_y = floor((float)height * 0.5);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetCursorPosCallback(window, cursor_position_callback);
 	glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
 }
@@ -56,11 +67,61 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
                 }
             }
             if (selected_obj > -1) {
-                navigating = false;
+                exitFromNavigation();
                 // cout << "Oggetto selezionato: " << models[selected_obj]->name.c_str() << endl;
             }
         }
 	}
+}
+
+
+float Theta = -89.0;
+float Phi = 0.0;
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
+    
+    xpos = static_cast<float>(xpos);
+    ypos = static_cast<float>(ypos);
+    float xoffset, yoffset;
+    float alfa = 0.05; //serve ridimensionare l'offset tra due posizioni successive del mosue
+    ypos = height - ypos;
+
+    float center_x = width / 2.0f;
+    float center_y = height / 2.0f;
+
+    xoffset = xpos - center_x;
+    yoffset = ypos - center_y;
+
+    if (navigating)
+    {
+        xoffset *= alfa;
+        yoffset *= alfa;
+        //Aggiorna gli angoli di rotazione orizzontale(Theta) e verticale(Phi) in base agli offset calcolati.
+        // L'angolo Theta controlla la rotazione attorno all'asse y, mentre Phi controlla la rotazione attorno all'asse x.
+        Theta += xoffset;   //Aggiorno l'angolo Theta sommandogli l'offset della posizione x del mouse
+        Phi += yoffset;  //Aggiorno l'angolo Phi sommandogli l'offset della posizione y del mouse 
+
+        // Facciamo si' che l'angolo di Phi vari tra -90 e 90, evitando così di capovolgere la telecamera.
+        if (Phi > 89.0f)
+            Phi = 89.0f;
+        if (Phi < -89.0f)
+            Phi = -89.0f;
+
+        //Calcola le coordinate x, y e z di un punto sulla sfera unitaria, 
+        // utilizzando gli angoli Theta e Phi convertiti in radianti.Questo punto rappresenta la direzione in cui punta la telecamera.
+        vec3 front;
+        front.x = cos(radians(Theta)) * cos(radians(Phi));
+        front.y = sin(radians(Phi));
+        front.z = sin(radians(Theta)) * cos(radians(Phi));
+        //Normalizza il vettore front per ottenere un vettore unitario che rappresenta la nuova direzione della telecamera.
+
+        camera->direction = normalize(front); //Aggiorno la direzione della telecamera
+        camera->target = camera->position + camera->direction; //aggiorno il punto in cui guarda la telecamera
+
+        //Disabilita il cursore del mouse per evitare che si muova fuori dalla finestra durante la navigazione.
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        //Riposiziona il cursore al centro della finestra per mantenere una navigazione fluida.
+        glfwSetCursorPos(window, (int)center_x, (int)center_y);
+    }
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -83,12 +144,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             mov_y = 0;
             mov_z = 0;
             selected_obj = -1;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetCursorPos(window, center_x, center_y);
+        }
+        else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
     }
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         if (navigating) {
-            navigating = false;
+            exitFromNavigation();
         }
         if (selected_obj != -1) {
             selected_obj = -1;
@@ -145,7 +211,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             mov_y--;
         }
     }
-
 }
 
 
@@ -225,4 +290,9 @@ bool ray_sphere(vec3 O, vec3 d, vec3 sphere_centre_wor, float sphere_radius, flo
     }
 
     return false;
+}
+
+void exitFromNavigation() {
+    navigating = false;
+    glfwSetInputMode(this_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }

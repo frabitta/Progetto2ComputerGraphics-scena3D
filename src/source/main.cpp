@@ -44,7 +44,7 @@ int main(void) {
 	while (!glfwWindowShouldClose(window)) {
 		double currentFrame = glfwGetTime();
 		double deltaTime = currentFrame - prevFrame;
-		// scena.update(deltaTime);
+		scena.update(deltaTime);
 		double prevFrame = currentFrame;
 		
 		my_interface(window);
