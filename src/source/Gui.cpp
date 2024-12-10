@@ -6,6 +6,7 @@
 
 /* scena globale */
 extern Light* light1;
+extern Light* light2;
 extern Camera* camera;
 extern vector<Model*> models;
 extern bool flagWF;
@@ -13,6 +14,8 @@ extern bool flagAncora;
 /* menu globale */
 float posL1[3];
 float coloreL1[3];
+float posL2[3];
+float coloreL2[3];
 
 /* selezione */
 extern int selected_obj;
@@ -49,10 +52,16 @@ void Initialize_IMGUI(GLFWwindow* window) {
     posL1[0] = light1->position.x;
     posL1[1] = light1->position.y;
     posL1[2] = light1->position.z;
-
     coloreL1[0] = light1->color.r;
     coloreL1[1] = light1->color.g;
     coloreL1[2] = light1->color.b;
+
+    posL2[0] = light2->position.x;
+    posL2[1] = light2->position.y;
+    posL2[2] = light2->position.z;
+    coloreL2[0] = light2->color.r;
+    coloreL2[1] = light2->color.g;
+    coloreL2[2] = light2->color.b;
 }
 
 void my_interface(GLFWwindow* window) {
@@ -70,21 +79,21 @@ void my_interface(GLFWwindow* window) {
         ImGuiWindowFlags_NoMove          //Impedisce all'utente di spostare la finestra
     );
 
-    ImGui::LabelText("Light 1","");
-    ImGui::SliderFloat3("pos", posL1, -50, +50);
+    ImGui::Text("Light 1");
+    ImGui::SliderFloat3("pos", posL1, -10, +10);
     light1->position = vec3(posL1[0], posL1[1], posL1[2]);
     ImGui::ColorEdit3("color", coloreL1, 0);
     light1->color = vec3(coloreL1[0], coloreL1[1], coloreL1[2]);
-    ImGui::SliderFloat("power", &light1->power, 0, 10);
+    ImGui::SliderFloat("power", &light1->power, 0, 20);
     ImGui::NewLine();
-    /*
-    ImGui::LabelText("Light 2", "");
-    ImGui::SliderFloat3("pos", posL2, -50, +50);
+    
+    ImGui::Text("Light 2");
+    ImGui::SliderFloat3("pos2", posL2, -10, +10);
     light2->position = vec3(posL2[0], posL2[1], posL2[2]);
-    ImGui::ColorEdit3("color", coloreL2, 0);
+    ImGui::ColorEdit3("color2", coloreL2, 0);
     light2->color = vec3(coloreL2[0], coloreL2[1], coloreL2[2]);
-    ImGui::SliderFloat("power", &light2->power, 0, 10);
-    */
+    ImGui::SliderFloat("power2", &light2->power, 0, 20);
+    
     ImGui::NewLine();
     ImGui::Checkbox("Wireframe", &flagWF);
     ImGui::Checkbox("VisualizzaAncora ", &flagAncora);

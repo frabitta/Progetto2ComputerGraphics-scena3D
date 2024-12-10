@@ -4,6 +4,8 @@ layout (location = 1) in vec4 aColor;       // color of the vertex
 layout (location = 2) in vec3 vertexNormal; // normal to the vertex
 layout (location = 3) in vec2 coord_st;     // Attributo texture -------- TODO
 
+#define NUM_LIGHTS 2
+
 struct PointLight {
 	vec3 position;
 	vec3 color;
@@ -28,7 +30,7 @@ uniform mat4 Model;
 uniform mat4 View;
 uniform vec3 ViewPos;
 uniform int shadingType;
-uniform PointLight light;
+uniform PointLight light[NUM_LIGHTS];
 uniform Material material;
 uniform int textureSi;
 
@@ -60,50 +62,60 @@ void main()
     normal = N;
 
     if (shadingType == TOON) {
-        float luminosity = dot(vertexNormal, light.position-aPos);
-        float damping = 0.5;
-        ourColor = aColor * luminosity * light.power * damping * (1/length(light.position-aPos));
+        float luminosity = 0;
+        for (int i = 0; i<NUM_LIGHTS; i++) {
+            luminosity = dot(vertexNormal, light[i].position-aPos) * light[i].power * strenght * (1/length(light[i].position-aPos));
+        }
+        luminosity /= NUM_LIGHTS;
+        ourColor = aColor * luminosity;
     }
 
     if (shadingType == PHONG || shadingType == BLINN_PHONG) {
         //Trasformare le coordinate del vertice da elaborare (aPos) in coordinate di vista
         vec4 eyePosition = View * Model * vec4(aPos, 1.0);
 
-        //Trasformiamo la posizione della luce nelle coordinate di vista
-        vec4 eyeLightPos = View * vec4(light.position, 1.0);
+        vec3 ambient = vec3(0.,0.,0.);
+        vec3 diffuse = vec3(0.,0.,0.);
+        vec3 specular = vec3(0.,0.,0.);
+        for (int i = 0; i<NUM_LIGHTS; i++) {
+            float distanceDamping = 1/length(light[i].position-aPos);
 
-        //Calcoliamo la direzione della luce L, la direzione riflessione R e di vista
-        vec3 V = normalize(ViewPos - eyePosition.xyz);
-        vec3 L = normalize((eyeLightPos - eyePosition).xyz);
+            //Trasformiamo la posizione della luce nelle coordinate di vista
+            vec4 eyeLightPos = View * vec4(light[i].position, 1.0);
 
-        vec3 R; vec3 H;
-        if (shadingType == PHONG) {
-            R = reflect(-L, N);  //Costruisce la direzione riflessa di L rispesso alla normale
-        } else {
-            H = normalize(L+V);  //Costruisce la direzione riflessa di L rispesso alla normale
-        }
+            //Calcoliamo la direzione della luce L, la direzione riflessione R e di vista
+            vec3 V = normalize(ViewPos - eyePosition.xyz);
+            vec3 L = normalize((eyeLightPos - eyePosition).xyz);
 
-        //ambientale
-        vec3 ambient = strenght * light.power * material.ambient;
+            vec3 R; vec3 H;
+            if (shadingType == PHONG) {
+                R = reflect(-L, N);  //Costruisce la direzione riflessa di L rispesso alla normale
+            } else {
+                H = normalize(L+V);  //Costruisce la direzione riflessa di L rispesso alla normale
+            }
+
+            //ambientale
+            ambient += strenght * light[i].power * material.ambient * distanceDamping;
         
-        //diffuse
-        float coseno_angolo_theta = max(dot(L, N), 0);
-        vec3 diffuse = light.power * light.color * coseno_angolo_theta * material.diffuse;
+            //diffuse
+            float coseno_angolo_theta = max(dot(L, N), 0);
+            diffuse += light[i].power * light[i].color * coseno_angolo_theta * material.diffuse * distanceDamping;
         
-        //speculare
-        float coseno_angolo;
-        if (shadingType == PHONG) {
-            float coseno_alfa = pow(max(dot(V, R), 0), material.shininess);
-            coseno_angolo = coseno_alfa;
-        } else {
-            float coseno_beta = pow(max(dot(H, N), 0), material.shininess);
-            coseno_angolo = coseno_beta;
+            //speculare
+            float coseno_angolo;
+            if (shadingType == PHONG) {
+                float coseno_alfa = pow(max(dot(V, R), 0), material.shininess);
+                coseno_angolo = coseno_alfa;
+            } else {
+                float coseno_beta = pow(max(dot(H, N), 0), material.shininess);
+                coseno_angolo = coseno_beta;
+            }
+            specular += light[i].power * light[i].color * coseno_angolo * material.specular * distanceDamping;   
         }
-        vec3 specular = light.power * light.color * coseno_angolo * material.specular;
+        ambient /= NUM_LIGHTS;
+        diffuse /= NUM_LIGHTS;
+        specular /= NUM_LIGHTS;
         ourColor = vec4(ambient + diffuse + specular, 1.0);
-    } else if (shadingType == GOURAUD) {
-        // TODO ---------------------
-        isGouraud = 1;
     }
     
     if (textureSi != 0) {

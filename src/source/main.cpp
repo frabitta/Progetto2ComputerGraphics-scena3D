@@ -18,6 +18,7 @@ int width;
 GLFWwindow* window;
 
 Light* light1;
+Light* light2;
 Camera* camera;
 vector<Model*> models;
 bool flagWF = false;
@@ -33,6 +34,7 @@ int main(void) {
 
 	scena.initScene();
 	light1 = scena.getLight1();
+	light2 = scena.getLight2();
 	camera = scena.getCamera();
 	models = scena.getModels();
 

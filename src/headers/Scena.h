@@ -16,6 +16,8 @@ public:
 	Camera* getCamera();
 	/* restituisce un puntatore alla luce*/
 	Light* getLight1();
+	/* restituisce un puntatore alla luce*/
+	Light* getLight2();
 	/* renderizza la scena */
 	void render(double time, bool flagWireFrame, bool flagAnchorPoints);
 	/* distrugge la scena */
@@ -26,5 +28,6 @@ private:
 	// void loadShaders();
 	Camera* camera;
 	Light* light1;
+	Light* light2;
 	vector<Model*> models;
 };

@@ -50,7 +50,7 @@ static struct {
 	GLint  position;
 	GLint  color;
 	GLint  power;
-} uni_light;
+} uni_light, uni_light2;
 
 static struct {
 	GLint  diffuse;
@@ -105,9 +105,14 @@ void Scena::initScene() {
 	loadShaders();
 	this->camera = new Camera();
 	this->light1 = new Light();
-	this->light1->position = vec3(0., 0., 0.);
+	this->light1->position = vec3(2., 1., 2.);
 	this->light1->color = vec3(1., 0., 0.);
-	this->light1->power = 100.;
+	this->light1->power = 7.;
+	this->light2 = new Light();
+	this->light2->position = vec3(-2., 1., -1.);
+	this->light2->color = vec3(0., 1., 0.);
+	this->light2->power = 7.;
+
 
 	sky.createSkybox(skyboxCubemap);
 	skyboxProgramId = INIT_shaderProg(skyVertex, skyFragment);
@@ -173,6 +178,10 @@ Light* Scena::getLight1() {
 	return this->light1;
 }
 
+Light* Scena::getLight2() {
+	return this->light2;
+}
+
 void Scena::render(double time, bool flagWireFrame, bool flagAnchorPoints) {
 	// this->camera->position = vec3(10 * sin(time * 0.2), 0., 5+10*sin(time * 0.2));
 	
@@ -214,6 +223,9 @@ void Scena::render(double time, bool flagWireFrame, bool flagAnchorPoints) {
 	glUniform3f(uni_light.position, this->light1->position.x, this->light1->position.y, this->light1->position.z);
 	glUniform3f(uni_light.color, this->light1->color.x, this->light1->color.y, this->light1->color.z);
 	glUniform1f(uni_light.power, this->light1->power);
+	glUniform3f(uni_light2.position, this->light2->position.x, this->light2->position.y, this->light2->position.z);
+	glUniform3f(uni_light2.color, this->light2->color.x, this->light2->color.y, this->light2->color.z);
+	glUniform1f(uni_light2.power, this->light2->power);
 
 	// renderign dei singoli modelli -> delle singole mesh
 	unsigned int nModels = (unsigned int)this->models.size();
@@ -239,9 +251,13 @@ void loadShaders() {
 	uni_shading.textureSiNo = glGetUniformLocation(modelsProgramId, "textureSi");
 	uni_shading.textureLoc = glGetUniformLocation(modelsProgramId, "textureLoc");
 
-	uni_light.position = glGetUniformLocation(modelsProgramId, "light.position");
-	uni_light.color = glGetUniformLocation(modelsProgramId, "light.color");
-	uni_light.power = glGetUniformLocation(modelsProgramId, "light.power");
+	uni_light.position = glGetUniformLocation(modelsProgramId, "light[0].position");
+	uni_light.color = glGetUniformLocation(modelsProgramId, "light[0].color");
+	uni_light.power = glGetUniformLocation(modelsProgramId, "light[0].power");
+
+	uni_light2.position = glGetUniformLocation(modelsProgramId, "light[1].position");
+	uni_light2.color = glGetUniformLocation(modelsProgramId, "light[1].color");
+	uni_light2.power = glGetUniformLocation(modelsProgramId, "light[1].power");
 
 	uni_material.diffuse = glGetUniformLocation(modelsProgramId, "material.diffuse");
 	uni_material.ambient = glGetUniformLocation(modelsProgramId, "material.ambient");
