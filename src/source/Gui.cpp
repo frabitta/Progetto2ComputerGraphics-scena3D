@@ -130,6 +130,9 @@ void my_interface(GLFWwindow* window) {
             if (ImGui::MenuItem("Pass through")) {
                 selectedModel->setShading(ShadingType::PASS_THROUGH);
             }
+            if (ImGui::MenuItem("Toon")) {
+                selectedModel->setShading(ShadingType::TOON);
+            }
             if (ImGui::MenuItem("Phong")) {
                 selectedModel->setShading(ShadingType::PHONG);
             }

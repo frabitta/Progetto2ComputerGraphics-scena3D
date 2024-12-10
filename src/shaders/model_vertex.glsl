@@ -59,6 +59,12 @@ void main()
     vec3 N = normalize(transpose(inverse(mat3(View * Model))) * vertexNormal);
     normal = N;
 
+    if (shadingType == TOON) {
+        float luminosity = dot(vertexNormal, light.position-aPos);
+        float damping = 0.5;
+        ourColor = aColor * luminosity * light.power * damping * (1/length(light.position-aPos));
+    }
+
     if (shadingType == PHONG || shadingType == BLINN_PHONG) {
         //Trasformare le coordinate del vertice da elaborare (aPos) in coordinate di vista
         vec4 eyePosition = View * Model * vec4(aPos, 1.0);
