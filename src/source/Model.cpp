@@ -20,7 +20,8 @@ void Model::assingUniformsToMeshes() {
 }
 
 void Model::loadUniforms(GLint  mat_ambient, GLint  mat_diffuse, GLint  mat_specular, GLint  mat_shininess,
-	GLint  uni_TextureYesNo, GLint  uni_TextureLoc, GLint  uni_Model, GLint  uni_Shading, GLint uni_ambientReflectance) {
+	GLint  uni_TextureYesNo, GLint  uni_TextureLoc, GLint  uni_Model, GLint  uni_Shading, GLint uni_ambientReflectance,
+	GLint uni_waveAmp, GLint uni_waveOff, GLint uni_waveSpeed) {
 	this->loc_uni_mat_ambient = mat_ambient;
 	this->loc_uni_mat_diffuse = mat_diffuse;
 	this->loc_uni_mat_specular = mat_specular;
@@ -30,6 +31,9 @@ void Model::loadUniforms(GLint  mat_ambient, GLint  mat_diffuse, GLint  mat_spec
 	this->loc_uni_Model = uni_Model;
 	this->loc_uni_Shading = uni_Shading;
 	this->loc_uni_ambientReflectance = uni_ambientReflectance;
+	this->loc_uni_waveAmp = uni_waveAmp;
+	this->loc_uni_waveOff = uni_waveOff;
+	this->loc_uni_waveSpeed = uni_waveSpeed;
 	this->assingUniformsToMeshes();
 }
 
@@ -190,6 +194,10 @@ void Model::initModel(ShadingType shadingType, string nome) {
 }
 
 void Model::renderModel(bool flagAncora) {
+	glUniform1f(this->loc_uni_waveAmp, this->waveAmp);
+	glUniform1f(this->loc_uni_waveOff, this->waveOff);
+	glUniform1f(this->loc_uni_waveSpeed, this->waveSpeed);
+
 	for (int i = 0; i < this->meshes.size(); i++) {
 		this->meshes[i]->render();
 	}

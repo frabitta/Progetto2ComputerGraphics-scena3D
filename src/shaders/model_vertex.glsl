@@ -17,6 +17,11 @@ struct Material {
     vec3 specular;
     float shininess;
 };
+struct Wave {
+    float Amp;
+    float Off;
+    float Speed;
+};
 
 int PASS_THROUGH=0;
 int TOON = 1;
@@ -33,6 +38,8 @@ uniform int shadingType;
 uniform PointLight light[NUM_LIGHTS];
 uniform Material material;
 uniform int textureSi;
+uniform Wave wave;
+
 
 out vec4 ourColor;      // output color to the fragment shader
 out vec2 frag_coord;    // fragment coordinate
@@ -45,6 +52,15 @@ out vec3 cameraPos;
 out vec3 normal;
 
 float strenght = 0.1;
+
+float func(float amp, float x, float off, float speed) {
+    off += time;
+    off *= speed;
+    // float res = pow(sin(x+off),2)*(-0.8) + pow(sin(x+0.3+off),4)*0.9 + pow(sin(x+0.6+off),3) * 0.2;
+    float res = sin(x+off) + sin(2*x+off);
+    res *= amp;
+    return res;
+}
 
 void main()
 {
@@ -122,5 +138,12 @@ void main()
         frag_coord = coord_st;
     }
     
-    gl_Position = Projection*View*Model*vec4(aPos, 1.0);
-}  
+    vec4 v = vec4(aPos, 1.0);
+
+    if (wave.Amp != 0) {
+        v.z += func(wave.Amp, v.x*0.7+v.y*0.3, wave.Off, wave.Speed);
+        v.y += func(wave.Amp / 3, v.x, wave.Off, wave.Speed);
+    }
+
+    gl_Position = Projection*View*Model*v;
+}

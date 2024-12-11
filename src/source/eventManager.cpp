@@ -22,6 +22,8 @@ int mov_y = 0;
 int mov_z = 0;
 double off_xpos;
 double off_ypos;
+bool rotating = false;
+vec3 rotationNextPos;
 
 GLFWwindow* this_window;
 
@@ -36,6 +38,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 int center_x;
 int center_y;
+
+float Theta = -89.0;
+float Phi = 0.0;
+float ThetaR;
+float PhiR;
+float rotDistance = 5.;
 
 void setupCallbacks(GLFWwindow* window) {
     this_window = window;
@@ -68,15 +76,23 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             }
             if (selected_obj > -1) {
                 exitFromNavigation();
-                // cout << "Oggetto selezionato: " << models[selected_obj]->name.c_str() << endl;
             }
         }
 	}
+    if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
+        ThetaR = 180 - degrees(acos(camera->direction.x)) * -sign(camera->direction.z);
+        PhiR = degrees(asin(-camera->direction.y));
+        camera->target = camera->position + camera->direction * rotDistance;
+        rotating = true;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPos(window, center_x, center_y);
+    }
+    if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE) {
+        rotating = false;
+        exitFromNavigation();
+    }
 }
 
-
-float Theta = -89.0;
-float Phi = 0.0;
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
     
     xpos = static_cast<float>(xpos);
@@ -113,10 +129,30 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
         front.y = sin(radians(Phi));
         front.z = sin(radians(Theta)) * cos(radians(Phi));
         //Normalizza il vettore front per ottenere un vettore unitario che rappresenta la nuova direzione della telecamera.
-
         camera->direction = normalize(front); //Aggiorno la direzione della telecamera
         camera->target = camera->position + camera->direction; //aggiorno il punto in cui guarda la telecamera
+    }
+    if (rotating) {
+        xoffset *= alfa;
+        yoffset *= alfa;
 
+        // float distance = glm::length(camera->position - camera->target);
+
+        ThetaR += xoffset;
+        PhiR += yoffset;
+        if (Phi > 89.0f)
+            Phi = 89.0f;
+        if (Phi < -89.0f)
+            Phi = -89.0f;
+
+        float dirY = sin(radians(PhiR));
+        float dirX = cos(radians(ThetaR));
+        float dirZ = sin(radians(ThetaR));
+        vec3 dirPos = vec3(dirX, dirY, dirZ);
+        rotationNextPos = camera->target + normalize(dirPos) * rotDistance;
+
+    }
+    if (navigating || rotating) {
         //Disabilita il cursore del mouse per evitare che si muova fuori dalla finestra durante la navigazione.
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         //Riposiziona il cursore al centro della finestra per mantenere una navigazione fluida.
@@ -144,6 +180,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             mov_y = 0;
             mov_z = 0;
             selected_obj = -1;
+            Theta = - degrees(acos(camera->direction.x)) * -sign(camera->direction.z);
+            Phi = -degrees(asin(-camera->direction.y));
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             glfwSetCursorPos(window, center_x, center_y);
         }
@@ -294,5 +332,6 @@ bool ray_sphere(vec3 O, vec3 d, vec3 sphere_centre_wor, float sphere_radius, flo
 
 void exitFromNavigation() {
     navigating = false;
+    rotating = false;
     glfwSetInputMode(this_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }

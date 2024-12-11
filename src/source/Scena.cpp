@@ -60,6 +60,12 @@ static struct {
 	GLint ambientReflectance;
 } uni_material;
 
+static struct {
+	GLint amp;
+	GLint off;
+	GLint speed;
+} uni_wave;
+
 static GLuint skyboxProgramId;
 static GLuint modelsProgramId;
 
@@ -79,8 +85,11 @@ extern bool navigating;
 extern int mov_x;
 extern int mov_y;
 extern int mov_z;
+extern bool rotating;
+extern vec3 rotationNextPos;
 
 void Scena::update(double deltaTime) {
+	vec3 nextPos;
 	if (navigating) {
 		float speed = 0.3;
 		vec3 movementVector = vec3(0., 0., 0.);
@@ -90,11 +99,18 @@ void Scena::update(double deltaTime) {
 		if (movementVector != vec3(0.,0.,0.)) {
 			movementVector = normalize(movementVector) * speed;
 		}
+		nextPos = this->camera->position + movementVector;
 		
-		vec3 nextPos = this->camera->position + movementVector;
 		if (!checkCollision(nextPos, this->models)) {
 			this->camera->position = nextPos;
-			camera->target = camera->position + camera->direction; //aggiorno il punto in cui guarda la telecamera
+			this->camera->target = this->camera->position + this->camera->direction; //aggiorno il punto in cui guarda la telecamera
+		}
+	}
+	else if (rotating) {
+		nextPos = rotationNextPos;
+		if (!checkCollision(nextPos, this->models)) {
+			this->camera->position = nextPos;
+			this->camera->direction = normalize(this->camera->target - this->camera->position);
 		}
 	}
 }
@@ -125,7 +141,8 @@ void Scena::initScene() {
 	Model* modello = new Model();
 	modello->loadFromObj("Shelby.obj", ShadingType::BLINN_PHONG, "Macchina");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
-		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance);
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
+		uni_wave.amp, uni_wave.off, uni_wave.speed);
 	modello->goToPos(vec3(0., 0., -3.));
 	modello->scale(vec3(3., 3., 3.));
 	modello->setReflectance(0.8);
@@ -135,7 +152,8 @@ void Scena::initScene() {
 	modello->addGeometry(Geometry::PIANO_SUDDIVISO, vec4(1., 0., 0., 1.));
 	modello->compileGeometry(ShadingType::PHONG, mat_marrone, "terra");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
-		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance);
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
+		uni_wave.amp, uni_wave.off, uni_wave.speed);
 	modello->goToPos(vec3(0., -3., 0.));
 	modello->scale(vec3(200., 1., 200.));
 	this->models.push_back(modello);
@@ -144,7 +162,8 @@ void Scena::initScene() {
 	modello->addGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.));
 	modello->compileGeometry(ShadingType::BLINN_PHONG, mat_ottone, "cubo1");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
-		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance);
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
+		uni_wave.amp, uni_wave.off, uni_wave.speed);
 	modello->goToPos(vec3(4.,0.,0.));
 	// modello->setTexture(true, texture);
 	this->models.push_back(modello);
@@ -154,7 +173,8 @@ void Scena::initScene() {
 	modello->addGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.));
 	modello->compileGeometry(ShadingType::BLINN_PHONG, mat_plasticaRossa, "cubo2");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
-		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance);
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
+		uni_wave.amp, uni_wave.off, uni_wave.speed);
 	modello->goToPos(vec3(0., 4., 0.));
 	this->models.push_back(modello);
 	
@@ -264,7 +284,12 @@ void loadShaders() {
 	uni_material.specular = glGetUniformLocation(modelsProgramId, "material.specular");
 	uni_material.shininess = glGetUniformLocation(modelsProgramId, "material.shininess");
 	uni_material.ambientReflectance = glGetUniformLocation(modelsProgramId, "reflectance");
+
+	uni_wave.amp = glGetUniformLocation(modelsProgramId, "wave.Amp");
+	uni_wave.off = glGetUniformLocation(modelsProgramId, "wave.Off");
+	uni_wave.speed = glGetUniformLocation(modelsProgramId, "wave.Speed");
 }
+
 
 void Scena::cleanStructure() {
 	delete(this->camera);

@@ -16,7 +16,8 @@ class Model {
 public:
 	/* load uniform indices */
 	void loadUniforms(GLint  mat_ambient, GLint  mat_diffuse, GLint  mat_specular, GLint  mat_shininess,
-		GLint  uni_TextureYesNo, GLint  uni_TextureLoc, GLint  uni_Model, GLint  uni_Shading, GLint uni_ambientReflectance);
+		GLint  uni_TextureYesNo, GLint  uni_TextureLoc, GLint  uni_Model, GLint  uni_Shading, GLint uni_ambientReflectance,
+		GLint uni_waveAmp, GLint uni_waveOff, GLint uni_waveSpeed);
 	/* create a model from a .obj file*/
 	void loadFromObj(const char* fileName, ShadingType shadingType, string name);
 	/* adds a primitive to the model geometry */
@@ -52,6 +53,9 @@ public:
 	float angolo = 0.f;
 	vec3 rotation_axis = vec3(0.,1.,0.);
 	vec3 dimensioni = vec3(1.,1.,1.);
+	float waveAmp = 0;
+	float waveOff = 0;
+	float waveSpeed = 0;
 
 private:
 	void normalizeModel();
@@ -69,6 +73,7 @@ private:
 	GLint  loc_uni_TextureYesNo, loc_uni_TextureLoc;
 	GLint  loc_uni_Model, loc_uni_Shading;
 	GLint loc_uni_ambientReflectance;
+	GLint loc_uni_waveAmp, loc_uni_waveOff, loc_uni_waveSpeed;
 
 	BoundingBox bb;
 };

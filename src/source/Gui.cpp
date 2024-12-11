@@ -134,6 +134,10 @@ void my_interface(GLFWwindow* window) {
         ImGui::SliderFloat("reflectance", &refl, 0, 1);
         selectedModel->setReflectance(refl);
         */
+        // wave
+        ImGui::SliderFloat("wave amplitude", &selectedModel->waveAmp, 0, 1);
+        ImGui::SliderFloat("wave offset", &selectedModel->waveOff, 0, 5);
+        ImGui::SliderFloat("wave speed", &selectedModel->waveSpeed, 0, 5);
         // shading
         if (ImGui::BeginMenu("Shader")) {
             if (ImGui::MenuItem("Pass through")) {
