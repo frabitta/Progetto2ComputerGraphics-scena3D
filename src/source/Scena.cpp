@@ -89,7 +89,7 @@ extern bool rotating;
 extern vec3 rotationNextPos;
 
 void Scena::update(double deltaTime) {
-	vec3 nextPos;
+	vec3 nextPos = this->camera->position;
 	if (navigating) {
 		float speed = 0.3;
 		vec3 movementVector = vec3(0., 0., 0.);
