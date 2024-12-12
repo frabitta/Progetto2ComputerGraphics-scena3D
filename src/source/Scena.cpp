@@ -179,7 +179,7 @@ void Scena::initScene() {
 	*/
 	cout << "caricamento 1 ";
 	Model* modello = new Model();
-	modello->loadFromObj("cartoon_boy.obj", ShadingType::PHONG, "alberi");
+	modello->loadFromObj("truck.obj", ShadingType::PHONG, "alberi");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
 		uni_wave.amp, uni_wave.off, uni_wave.speed);
