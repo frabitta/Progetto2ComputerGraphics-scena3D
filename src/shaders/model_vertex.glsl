@@ -80,7 +80,7 @@ void main()
     if (shadingType == TOON) {
         float luminosity = 0;
         for (int i = 0; i<NUM_LIGHTS; i++) {
-            luminosity = dot(vertexNormal, light[i].position-aPos) * light[i].power * strenght * (1/length(light[i].position-aPos));
+            luminosity += dot(vertexNormal, light[i].position-aPos) * light[i].power * strenght * (1/length(light[i].position-aPos));
         }
         luminosity /= NUM_LIGHTS;
         ourColor = aColor * luminosity;

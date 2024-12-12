@@ -73,7 +73,7 @@ mat4 Projection = mat4(1.0);
 mat4 View = mat4(1.0);
 
 /* sky */
-string skyboxCubemap = "field";
+string skyboxCubemap = "dark";
 Skybox sky;
 GLint skybox_uni_proj;
 GLint skybox_uni_view;
@@ -91,7 +91,7 @@ extern vec3 rotationNextPos;
 void Scena::update(double deltaTime) {
 	vec3 nextPos = this->camera->position;
 	if (navigating) {
-		float speed = 0.3;
+		float speed = 0.03;
 		vec3 movementVector = vec3(0., 0., 0.);
 		movementVector += normalize(this->camera->upVector) * (float)mov_y;
 		movementVector += normalize(this->camera->direction) * -(float)mov_z;
@@ -138,6 +138,7 @@ void Scena::initScene() {
 	glUseProgram(modelsProgramId);
 	glUniform1i(glGetUniformLocation(modelsProgramId, "skybox"),sky.cubemap);
 
+	/*
 	Model* modello = new Model();
 	modello->loadFromObj("Shelby.obj", ShadingType::BLINN_PHONG, "Macchina");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
@@ -147,7 +148,7 @@ void Scena::initScene() {
 	modello->scale(vec3(3., 3., 3.));
 	modello->setReflectance(0.8);
 	this->models.push_back(modello);
-
+	
 	modello = new Model();
 	modello->addGeometry(Geometry::PIANO_SUDDIVISO, vec4(1., 0., 0., 1.));
 	modello->compileGeometry(ShadingType::PHONG, mat_marrone, "terra");
@@ -157,7 +158,7 @@ void Scena::initScene() {
 	modello->goToPos(vec3(0., -3., 0.));
 	modello->scale(vec3(200., 1., 200.));
 	this->models.push_back(modello);
-
+	
 	modello = new Model();
 	modello->addGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.));
 	modello->compileGeometry(ShadingType::BLINN_PHONG, mat_ottone, "cubo1");
@@ -165,10 +166,8 @@ void Scena::initScene() {
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
 		uni_wave.amp, uni_wave.off, uni_wave.speed);
 	modello->goToPos(vec3(4.,0.,0.));
-	// modello->setTexture(true, texture);
 	this->models.push_back(modello);
 	
-
 	modello = new Model();
 	modello->addGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.));
 	modello->compileGeometry(ShadingType::BLINN_PHONG, mat_plasticaRossa, "cubo2");
@@ -177,6 +176,16 @@ void Scena::initScene() {
 		uni_wave.amp, uni_wave.off, uni_wave.speed);
 	modello->goToPos(vec3(0., 4., 0.));
 	this->models.push_back(modello);
+	*/
+	cout << "caricamento 1 ";
+	Model* modello = new Model();
+	modello->loadFromObj("cartoon_boy.obj", ShadingType::PHONG, "alberi");
+	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
+		uni_wave.amp, uni_wave.off, uni_wave.speed);
+	modello->goToPos(vec3(0., 0., 0.));
+	this->models.push_back(modello);
+	cout << "terminato" << endl;
 	
 	this->resetScene();
 }
