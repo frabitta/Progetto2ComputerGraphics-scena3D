@@ -140,8 +140,12 @@ void crea_piano_suddiviso(Mesh* mesh, vec4 colore)
 			mesh->colors.push_back(colore);
 			mesh->normals.push_back(vec3(0.0, 1.0, 0.0));
 			//Coordinate di texture
+			/*
 			s = x;
 			t = y;
+			*/
+			s = j;
+			t = i;
 			mesh->texCoords.push_back(vec2(s, t));
 
 		}

@@ -39,7 +39,6 @@ int main(void) {
 	models = scena.getModels();
 
 	setupCallbacks(window);
-
 	Initialize_IMGUI(window);
 
 	double prevFrame = glfwGetTime();

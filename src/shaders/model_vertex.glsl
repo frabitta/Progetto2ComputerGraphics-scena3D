@@ -77,24 +77,30 @@ void main()
     vec3 N = normalize(transpose(inverse(mat3(View * Model))) * vertexNormal);
     normal = N;
 
+    vec3 p = aPos;
+    if (wave.Amp != 0) {
+        p.z += func(wave.Amp, p.x*0.7+p.y*0.3, wave.Off, wave.Speed);
+        p.y += func(wave.Amp / 3, p.x, wave.Off, wave.Speed);
+    }
+
     if (shadingType == TOON) {
         float luminosity = 0;
         for (int i = 0; i<NUM_LIGHTS; i++) {
-            luminosity += dot(vertexNormal, light[i].position-aPos) * light[i].power * strenght * (1/length(light[i].position-aPos));
+            luminosity += dot(vertexNormal, light[i].position-p) * light[i].power * strenght * (1/length(light[i].position-p));
         }
         luminosity /= NUM_LIGHTS;
         ourColor = aColor * luminosity;
     }
 
     if (shadingType == PHONG || shadingType == BLINN_PHONG) {
-        //Trasformare le coordinate del vertice da elaborare (aPos) in coordinate di vista
-        vec4 eyePosition = View * Model * vec4(aPos, 1.0);
+        //Trasformare le coordinate del vertice da elaborare (p) in coordinate di vista
+        vec4 eyePosition = View * Model * vec4(p, 1.0);
 
         vec3 ambient = vec3(0.,0.,0.);
         vec3 diffuse = vec3(0.,0.,0.);
         vec3 specular = vec3(0.,0.,0.);
         for (int i = 0; i<NUM_LIGHTS; i++) {
-            float distanceDamping = 1/length(light[i].position-aPos);
+            float distanceDamping = 1/length(light[i].position-p);
 
             //Trasformiamo la posizione della luce nelle coordinate di vista
             vec4 eyeLightPos = View * vec4(light[i].position, 1.0);
@@ -138,12 +144,5 @@ void main()
         frag_coord = coord_st;
     }
     
-    vec4 v = vec4(aPos, 1.0);
-
-    if (wave.Amp != 0) {
-        v.z += func(wave.Amp, v.x*0.7+v.y*0.3, wave.Off, wave.Speed);
-        v.y += func(wave.Amp / 3, v.x, wave.Off, wave.Speed);
-    }
-
-    gl_Position = Projection*View*Model*v;
+    gl_Position = Projection*View*Model*vec4(p,1.0);
 }

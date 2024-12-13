@@ -30,6 +30,8 @@ Materiale mat_rosa = Materiale("Rosa", pink_ambient, pink_diffuse, pink_specular
 glm::vec3 brown_ambient = { 0.19125f, 0.0735f, 0.0225f }, brown_diffuse = { 0.7038f, 0.27048f, 0.0828f }, brown_specular{ 0.256777f, 0.137622f, 0.086014f }; GLfloat brown_shininess = 12.8f;
 Materiale mat_marrone = Materiale("Marrone", brown_ambient, brown_diffuse, brown_specular, brown_shininess);
 
+vec3 grass_ambient = { 0.1,0.2,0.1 }, grass_diffuse = { 0.2,0.5,0.2 }, grass_specular = { 0.0,0.05,0.0 }; GLfloat grass_shininess = 2.5;
+Materiale mat_grass = Materiale("Terra", grass_ambient, grass_diffuse, grass_specular, grass_shininess);
 
 // Strutture locali a questa scena
 static struct {
@@ -121,14 +123,15 @@ void Scena::initScene() {
 	loadShaders();
 	this->camera = new Camera();
 	this->light1 = new Light();
-	this->light1->position = vec3(2., 1., 2.);
-	this->light1->color = vec3(1., 0., 0.);
-	this->light1->power = 7.;
+	this->light1->position = vec3(0., 8., 0.);
+	this->light1->color = vec3(0.4, 0., 1.);
+	this->light1->power = 4.5;
 	this->light2 = new Light();
-	this->light2->position = vec3(-2., 1., -1.);
-	this->light2->color = vec3(0., 1., 0.);
-	this->light2->power = 7.;
+	this->light2->position = vec3(-0.257, -0.282, 1.278);
+	this->light2->color = vec3(1., 0.20, 0.);
+	this->light2->power = 20.;
 
+	this->camera->position = vec3(0., 1.5, 0.2);
 
 	sky.createSkybox(skyboxCubemap);
 	skyboxProgramId = INIT_shaderProg(skyVertex, skyFragment);
@@ -138,61 +141,105 @@ void Scena::initScene() {
 	glUseProgram(modelsProgramId);
 	glUniform1i(glGetUniformLocation(modelsProgramId, "skybox"),sky.cubemap);
 
-	/*
 	Model* modello = new Model();
 	modello->loadFromObj("Shelby.obj", ShadingType::BLINN_PHONG, "Macchina");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
 		uni_wave.amp, uni_wave.off, uni_wave.speed);
 	modello->goToPos(vec3(0., 0., -3.));
-	modello->scale(vec3(3., 3., 3.));
-	modello->setReflectance(0.8);
+	modello->rotate(45, vec3(0., 1., 0.));
+	modello->setReflectance(0.85);
 	this->models.push_back(modello);
 	
+
 	modello = new Model();
 	modello->addGeometry(Geometry::PIANO_SUDDIVISO, vec4(1., 0., 0., 1.));
-	modello->compileGeometry(ShadingType::PHONG, mat_marrone, "terra");
+	modello->compileGeometry(ShadingType::PHONG, mat_grass, "Terra");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
 		uni_wave.amp, uni_wave.off, uni_wave.speed);
-	modello->goToPos(vec3(0., -3., 0.));
+	GLuint tex = INIT_Texture("grass.jpg", 0);
+	modello->setTexture(true, tex);
+	modello->goToPos(vec3(0., 0., 0.));
 	modello->scale(vec3(200., 1., 200.));
 	this->models.push_back(modello);
+
+	modello = new Model();
+	modello->loadFromObj("piper_pa18.obj", ShadingType::PHONG, "Aereo");
+	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
+		uni_wave.amp, uni_wave.off, uni_wave.speed);
+	modello->goToPos(vec3(8.3, 9.1, -20.));
+	modello->scale(vec3(3.5, 3.5, 3.5));
+	modello->rotate(300, vec3(0., 1., 0.5));
+	this->models.push_back(modello);
+
+	modello = new Model();
+	modello->loadFromObj("guitar.obj", ShadingType::BLINN_PHONG, "Chitarra");
+	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
+		uni_wave.amp, uni_wave.off, uni_wave.speed);
+	modello->goToPos(vec3(-3.7,-0.7,0.));
+	modello->rotate(-90,vec3(1.,0.,0.));
+	modello->scale(vec3(.3, .3, .3));
+	this->models.push_back(modello);
 	
 	modello = new Model();
-	modello->addGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.));
-	modello->compileGeometry(ShadingType::BLINN_PHONG, mat_ottone, "cubo1");
+	modello->loadFromObj("Cartoon_boy.obj", ShadingType::BLINN_PHONG, "fantasma");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
 		uni_wave.amp, uni_wave.off, uni_wave.speed);
-	modello->goToPos(vec3(4.,0.,0.));
+	modello->goToPos(vec3(6.1, 0.4, -1.));
+	modello->rotate(-30, vec3(0., 1., 0.));
+	modello->waveAmp = 0.1;
+	modello->waveSpeed = 1.2;
 	this->models.push_back(modello);
 	
 	modello = new Model();
-	modello->addGeometry(Geometry::CUBO, vec4(1., 0., 0., 1.));
-	modello->compileGeometry(ShadingType::BLINN_PHONG, mat_plasticaRossa, "cubo2");
+	modello->loadFromObj("casa.obj", ShadingType::BLINN_PHONG, "Casa");
 	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
 		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
 		uni_wave.amp, uni_wave.off, uni_wave.speed);
-	modello->goToPos(vec3(0., 4., 0.));
+	modello->goToPos(vec3(-6.7, 2.5, -1.));
+	modello->rotate(238, vec3(0., 1., 0.));
+	modello->scale(vec3(3.5,3.5,3.5));
+	modello->setTexture(true, tex);
 	this->models.push_back(modello);
-	*/
-	cout << "caricamento 1 ";
-	Model* modello = new Model();
-	modello->loadFromObj("truck.obj", ShadingType::PHONG, "alberi");
-	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
-		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
-		uni_wave.amp, uni_wave.off, uni_wave.speed);
-	modello->goToPos(vec3(0., 0., 0.));
-	this->models.push_back(modello);
-	cout << "terminato" << endl;
 	
+	modello = new Model();
+	modello->addGeometry(Geometry::CILINDRO, vec4(1., 0., 0., 1.), vec3(0.2,0.,0.), 60, vec3(0.,0.,1.), vec3(.2,1,.2));
+	modello->addGeometry(Geometry::CILINDRO, vec4(1., 0., 0., 1.), vec3(-0.2, 0., 0.), -60, vec3(0., 0., 1.), vec3(.2, 1, .2));
+	modello->addGeometry(Geometry::CILINDRO, vec4(1., 0., 0., 1.), vec3(0., 0., 0.2), 60, vec3(1., 0., 0.), vec3(.2, 1, .2));
+	modello->addGeometry(Geometry::CILINDRO, vec4(1., 0., 0., 1.), vec3(0., 0., -0.2), -60, vec3(1., 0., 0.), vec3(.2, 1, .2));
+	modello->compileGeometry(ShadingType::PHONG, mat_marrone, "Tronco");
+	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
+		uni_wave.amp, uni_wave.off, uni_wave.speed);
+	tex = INIT_Texture("wood.jpg", 0);
+	modello->setTexture(true, tex);
+	modello->goToPos(vec3(0., -1.15, 1.));
+	modello->scale(vec3(.4, .6, .4));
+	modello->rotate(180, vec3(1.,0.,0.));
+	this->models.push_back(modello);
+
+	modello = new Model();
+	modello->addGeometry(Geometry::PIANO, vec4(1., 0., 0., 0.5));
+	modello->compileGeometry(ShadingType::BLINN_PHONG, mat_plasticaRossa, "Fuoco");
+	modello->waveAmp = 0.1;
+	modello->waveSpeed = 1;
+	modello->goToPos(vec3(-0.1, -0.7, 2.));
+	modello->rotate(90, vec3(1., 0., 0.));
+	modello->scale(vec3(0.1,1.,0.2));
+	modello->loadUniforms(uni_material.ambient, uni_material.diffuse, uni_material.specular, uni_material.shininess,
+		uni_shading.textureSiNo, uni_shading.textureLoc, uni_trans.Model, uni_shading.shadingType, uni_material.ambientReflectance,
+		uni_wave.amp, uni_wave.off, uni_wave.speed);
+	this->models.push_back(modello);
+
 	this->resetScene();
 }
 
 void Scena::resetScene() {
 	this->camera->initCamera();
-	this->light1->initLight();
 }
 
 vector<Model*> Scena::getModels() {

@@ -49,6 +49,11 @@ int INIT_finestraOpenGL(GLFWwindow*& window, const int height, const int width) 
 		glfwTerminate();
 		return -1;
 	}
+
+	/* trasparenza */
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	return 0;
 }
 

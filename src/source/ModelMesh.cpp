@@ -25,9 +25,10 @@ void ModelMesh::render() {
     // modello e vertici
     glUniformMatrix4fv(this->uni_Model, 1, GL_FALSE, value_ptr(this->Model));
     glBindVertexArray(this->VAO);
-
+    
     // texture
     glUniform1i(this->uni_TextureYesNo, this->texture);     // dice se c'è o no
+    // cout << this->texture << endl;
     if (this->texture) {
         // dice dove trovarla e la carica
         glUniform1i(this->uni_TextureLoc, 0);
