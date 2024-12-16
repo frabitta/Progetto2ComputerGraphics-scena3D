@@ -16,3 +16,11 @@ Un piccolo e semplice visualizzatore/editor di semplici scene 3D con OpenGL e Im
 - rotellina per zoom
 - 'esc' per uscire dalla navigazione
 - selezionare col tasto sinistro i modelli con cui si vuole interagire
+
+# Uso
+1. Scaricare la repository
+2. Aprire la soluzione in Visual Studio aprendo il file `.sls`
+3. Impostare la modalità di compilazione a "release"
+4. In 'Project Properties' -> 'Linker' -> 'General' -> 'Additional Library Directories' imposta il percorso della cartella contenente le seguenti librerie dinamiche: `glfw3.lib;opengl32.lib;assimp-vc142-mt.lib;assimp-vc142-mtd.lib;`
+
+Per modificare la scena visualizzata, modificare `initScene()` in `scena.cpp`.
